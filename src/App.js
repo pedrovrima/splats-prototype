@@ -2,7 +2,7 @@ import React,{useRef, useEffect,useState} from 'react';
 import './App.css';
 import effort_data from "./data/effort"
 import capture_data from "./data/capture"
-import {createPlot, createBins, updateData} from "./functions"
+import {createPlot,  updateData} from "./functions"
 
 function App() {
   let [binSize,setBinSize]=useState(10)
@@ -10,7 +10,15 @@ function App() {
   const updateBinSize=(bin)=>{
     setBinSize(bin);}
 
-
+    const createBins = (max, size) => {
+      let number_of_bins = Math.ceil(max / size);
+      let bins = [];
+      for (let i = 0; i < number_of_bins; i++) {
+        bins.push(5 + i * size);
+      }
+      return bins;
+    };
+    
     useEffect(()=>{
       updateData(refs.current, capture_data
 
