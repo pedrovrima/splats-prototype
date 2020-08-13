@@ -17,6 +17,9 @@
     "test": "jest",
     "eject": "react-scripts eject"
   },
+  "engines": {
+    "node": "10.21.0"
+  },
   "eslintConfig": {
     "extends": "react-app"
   },
