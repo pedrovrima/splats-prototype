@@ -491,7 +491,7 @@ function updateData (divId, data, variables, effort_data, bins){
 
 }
 
-module.exports = {
+export default {
   onlyUnique,
   getGroups,
   organizeGroups,
