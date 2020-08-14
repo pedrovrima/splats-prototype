@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "3f07a6ab94d1624aad5489935c67f4e5",
+    "revision": "b40a5b8299ec3c5b70ea767517e44f9e",
     "url": "/splats-prototype/index.html"
   },
   {
