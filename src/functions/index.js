@@ -352,7 +352,7 @@ function createPlot(divId, data, variables, effort_data, bins) {
     height = 400 - margin.top - margin.bottom;
 
   var d3Data = newCreateD3(data, variables, effort_data, bins);
-
+  console.log(d3Data)
   var svg = d3
     .select(divId)
     .append("svg")
@@ -366,7 +366,12 @@ function createPlot(divId, data, variables, effort_data, bins) {
   svg
     .append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(xAxis).ticks(15));
+    .call(d3.axisBottom(xAxis).ticks(365/5));
+
+    var ticks = d3.selectAll(".tick text");
+ticks.each(function(_,i){
+    if(i%2 !== 0) d3.select(this).remove();
+});
 
   const yAxis = d3
     .scaleLinear()
@@ -429,6 +434,7 @@ function createPlot(divId, data, variables, effort_data, bins) {
       .attr("cy", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
       .attr("r", 7)
       .style("fill", function(d){ return color(d)})
+      .style("stroke","black")
   
   // Add one dot in the legend for each name.
   svg.selectAll("mylabels")
@@ -436,8 +442,8 @@ function createPlot(divId, data, variables, effort_data, bins) {
     .enter()
     .append("text")
       .attr("x", width+10)
-      .attr("y", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
-      .style("fill", function(d){ return color(d)})
+      .attr("y", function(d,i){ return 105 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+      .style("fill", "black")
       .text(function(d){ return d})
       .attr("text-anchor", "left")
       .style("alignment-baseline", "middle")
