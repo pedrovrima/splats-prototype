@@ -10,20 +10,17 @@ const getGroups = (data, variable) => {
   return unique_values;
 };
 
+const filterStation = (effort_data, args) => {
+  return effort_data.filter((datum) => args.indexOf(datum.station) > -1);
+};
 
-const filterStation = (effort_data,args)=>{
- return effort_data.filter(datum=>args.indexOf(datum.station)>-1)
-}
+const getEffIds = (effort_data) => effort_data.map((datum) => datum.effort_id);
 
-const getEffIds = (effort_data)=>effort_data.map(datum=>datum.effort_id)
-
-
-const filterCaptures = (capture_data,effort_ids)=>{
-    return capture_data.filter(datum=>effort_ids.indexOf(datum.effort_id)>-1 )
-}
-
-
-
+const filterCaptures = (capture_data, effort_ids) => {
+  return capture_data.filter(
+    (datum) => effort_ids.indexOf(datum.effort_id) > -1
+  );
+};
 
 const organizeGroups = (data, variable) => {
   let groups = getGroups(data, variable);
@@ -290,7 +287,8 @@ function createD3Data(data, variables, effort_data, bins) {
   let nested_data = binNestter(flatten(d3_grouppes));
 
   let stacked_data = stackerD3(nested_data, groupped_data.groups);
-  return {    flat: flatten(d3_grouppes),
+  return {
+    flat: flatten(d3_grouppes),
 
     stack: stacked_data,
     groups: groupped_data.groups,
@@ -337,7 +335,6 @@ function newCreateD3(data, variables, effort_data, bins) {
   let nested_data = binNestter(flatten(binData));
 
   let stacked_data = stackerD3(nested_data, groups);
-  console.log(flatten(binData))
   return {
     stack: stacked_data,
     groups: groups,
@@ -360,7 +357,6 @@ function createPlot(divId, data, variables, effort_data, bins) {
     height = 400 - margin.top - margin.bottom;
 
   var d3Data = newCreateD3(data, variables, effort_data, bins);
-  console.log(d3Data);
   var svg = d3
     .select(divId)
     .append("svg")
@@ -462,14 +458,27 @@ function createPlot(divId, data, variables, effort_data, bins) {
       return d;
     })
     .attr("text-anchor", "left")
-    .style("alignment-baseline", "middle");
+    .style("alignment-baseline", "middle")
+    .attr("class", "labels");
 }
 
 function updateData(divId, data, variables, effort_data, bins) {
-  var margin = { top: 10, right: 30, bottom: 30, left: 60 },
+  var margin = { top: 10, right: 60, bottom: 30, left: 60 },
     width = 1000 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
   var newd3Data = newCreateD3(data, variables, effort_data, bins);
+  var color = d3
+  .scaleOrdinal()
+  .domain(newd3Data.groups)
+  .range([
+    "#FF0000FF",
+    "#FFFF00FF",
+    "#00FF00FF",
+    "#00FFFFFF",
+    "#0000FFFF",
+    "#FF00FFFF",
+  ]);
+
 
   const xAxis = d3.scaleLinear().domain([0, 365]).range([0, width]);
 
@@ -486,9 +495,67 @@ function updateData(divId, data, variables, effort_data, bins) {
   var svg = d3.select(divId);
 
   var paths = svg.select("g").selectAll("path.area").data(newd3Data.stack);
-  paths.exit().remove(); //remove unneeded circles
-  paths.enter().append("path");
-  console.log(paths);
+  paths.exit().remove(); 
+  paths.enter().append("path").attr("class","area").style("fill", function (d) {
+    let name = newd3Data.groups[d.key];
+    return color(name);
+  })
+  .attr(
+    "d",
+    d3
+      .area()
+      .x(function (d, i) {
+        return xAxis(d.data.key);
+      })
+      .y0(function (d) {
+        return yAxis(d[0]);
+      })
+      .y1(function (d) {
+        return yAxis(d[1]);
+      })
+  );
+;
+
+
+  let circles = svg.select("g").selectAll("circle").data(newd3Data.groups);
+
+  circles.exit().remove();
+
+  circles
+    .enter()
+    .append("circle")
+    .attr("cx", width)
+    .attr("cy", function (d, i) {
+      return 100 + i * 25;
+    }) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("r", 7)
+    .style("fill", function (d) {
+      return color(d);
+    })
+    .style("stroke", "black");
+
+  // Add one dot in the legend for each name.
+
+  let textRemove = svg.select("g").selectAll("text.labels").data([]);
+
+  textRemove.exit().remove();
+
+  let textAdd = svg.select("g").selectAll("text.labels").data(newd3Data.groups);
+
+  textAdd
+    .enter()
+    .append("text")
+    .attr("x", width + 10)
+    .attr("class", "labels")
+    .attr("y", function (d, i) {
+      return 105 + i * 25;
+    }) // 100 is where the first dot appears. 25 is the distance between dots
+    .style("fill", "black")
+    .text(function (d) {
+      return d;
+    })
+    .attr("text-anchor", "left")
+    .style("alignment-baseline", "middle");
 
   paths
     .transition()
@@ -509,7 +576,7 @@ function updateData(divId, data, variables, effort_data, bins) {
     );
 }
 
-module.exports= {
+module.exports = {
   onlyUnique,
   getGroups,
   organizeGroups,
@@ -525,7 +592,7 @@ module.exports= {
   dateCreator,
   groupFinder,
   groupGroupper,
-  
+
   getMean,
   getStandardDeviation,
   getStandardError,
@@ -551,6 +618,5 @@ module.exports= {
   updateData,
   filterStation,
   filterCaptures,
-  getEffIds
-
+  getEffIds,
 };
