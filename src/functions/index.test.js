@@ -14,8 +14,7 @@ const {
   dateCreator,
   groupFinder,
   groupGroupper,
-  countBins,
-  groupBinCounter,
+
   getMean,
   getStandardDeviation,
   getStandardError,
@@ -35,8 +34,10 @@ const {
   binNestter,
   stackerD3,
   numericGroups,
-  createD3Data,
-  newCreateD3
+  newCreateD3,
+  filterStation,
+  filterCaptures,
+  getEffIds,
 } = require("./index");
 
 test("return unique values", () => {
@@ -172,42 +173,6 @@ test("create groups based on group variable", () => {
     },
     { group: "b", data: [{ id: 2, group: "b" }] },
   ]);
-});
-
-test("counts number of a specific bin within an object", () => {
-  expect(
-    countBins(
-      [
-        { id: 1, bin: 7 },
-        { id: 2, bin: 5 },
-        { id: 3, bin: 5 },
-      ],
-      5
-    )
-  ).toBe(2);
-  expect(
-    countBins(
-      [
-        { id: 1, bin: 7 },
-        { id: 2, bin: 5 },
-        { id: 3, bin: 5 },
-      ],
-      9
-    )
-  ).toBe(0);
-});
-
-test("creates a count of bins", () => {
-  expect(
-    groupBinCounter(
-      [
-        { id: 1, bin: 7 },
-        { id: 2, bin: 5 },
-        { id: 3, bin: 5 },
-      ],
-      [5, 7, 9]
-    )
-  ).toStrictEqual([2, 1, 0]);
 });
 
 test("creates a count of bins", () => {
@@ -428,67 +393,6 @@ test("create a birds by 100NH value", () => {
   expect(birdsBy100NH({ nethours: 100, data: [1, 3, 4] })).toBe(3);
 });
 
-test("create data from raw bird data and effort until birds/100nh by effort", () => {
-  expect(
-    dataCreator(
-      [
-        { cloaca: "A", effort_id: 2 },
-        { cloaca: "B", effort_id: 2 },
-        { cloaca: "A", effort_id: 3 },
-        { cloaca: "A", effort_id: 3 },
-      ],
-      ["cloaca"],
-      [
-        { effort_id: 2, date: "11/01/1991", nethours: 10 },
-        { effort_id: 3, date: "11/01/1992", nethours: 20 },
-      ],
-      [10, 20, 30]
-    )
-  ).toStrictEqual({data:[
-    {
-      group: "A",
-      data: [
-        {
-          effort_id: 2,
-          julian: 305,
-          bin: 30,
-          date: "11/01/1991",
-          nethours: 10,
-          birdnhour: 10,
-          data: [{ cloaca: "A", effort_id: 2, group: "A" }],
-        },
-        {
-          effort_id: 3,
-          julian: 306,
-          bin: 30,
-          date: "11/01/1992",
-          nethours: 20,
-          birdnhour: 10,
-          data: [
-            { cloaca: "A", effort_id: 3, group: "A" },
-            { cloaca: "A", effort_id: 3, group: "A" },
-          ],
-        },
-      ],
-    },
-
-    {
-      group: "B",
-      data: [
-        {
-          effort_id: 2,
-          julian: 305,
-          bin: 30,
-          date: "11/01/1991",
-          nethours: 10,
-          birdnhour: 10,
-          data: [{ cloaca: "B", effort_id: 2, group: "B" }],
-        },
-      ],
-    },
-  ],groups:["A","B"]});
-});
-
 test("create bin from raw data with date", () => {
   expect(binner({ date: "12/01/1991" }, [1, 10, 20])).toStrictEqual({
     bin: 20,
@@ -536,61 +440,72 @@ test("creat d3 flat from one group data", () => {
 });
 
 test("nest data into bins", () => {
-  expect(binNestter([
-    { bin: 10, group: "A", mean: 0, se: 0 },
-    { bin: 20, group: "A", mean: 0, se: 0 },
-    { bin: 30, group: "A", mean: 10, se: 0 },
-  ])).toStrictEqual([{
-    key:"10",
-    values:[{bin:10,group: "A", mean: 0, se: 0}]
-  },
-  {
-    key:"20",
-    values:[{bin:20,group: "A", mean: 0, se: 0}]
-  },
-  {
-    key:"30",
-    values:[{bin:30,group: "A", mean: 10, se: 0}]
-  }
-]);
+  expect(
+    binNestter([
+      { bin: 10, group: "A", mean: 0, se: 0 },
+      { bin: 20, group: "A", mean: 0, se: 0 },
+      { bin: 30, group: "A", mean: 10, se: 0 },
+    ])
+  ).toStrictEqual([
+    {
+      key: "10",
+      values: [{ bin: 10, group: "A", mean: 0, se: 0 }],
+    },
+    {
+      key: "20",
+      values: [{ bin: 20, group: "A", mean: 0, se: 0 }],
+    },
+    {
+      key: "30",
+      values: [{ bin: 30, group: "A", mean: 10, se: 0 }],
+    },
+  ]);
 });
 
+test("stack nested data with group", () => {
+  expect(
+    stackerD3(
+      [
+        {
+          key: "10",
+          values: [{ bin: 10, group: "A", mean: 0, se: 0 }],
+        },
+        {
+          key: "20",
+          values: [{ bin: 20, group: "A", mean: 0, se: 0 }],
+        },
+        {
+          key: "30",
+          values: [{ bin: 30, group: "A", mean: 10, se: 0 }],
+        },
+      ],
+      ["A", "B"]
+    )[0][0][0]
+  ).toBe(0);
 
-test("stack nested data with group",()=>{
-  expect(stackerD3([{
-    key:"10",
-    values:[{bin:10,group: "A", mean: 0, se: 0}]
-  },
-  {
-    key:"20",
-    values:[{bin:20,group: "A", mean: 0, se: 0}]
-  },
-  {
-    key:"30",
-    values:[{bin:30,group: "A", mean: 10, se: 0}]
-  }
-],["A","B"])[0][0][0]).toBe(0)
+  expect(
+    stackerD3(
+      [
+        {
+          key: "10",
+          values: [{ bin: 10, group: "A", mean: 0, se: 0 }],
+        },
+        {
+          key: "20",
+          values: [{ bin: 20, group: "A", mean: 0, se: 0 }],
+        },
+        {
+          key: "30",
+          values: [{ bin: 30, group: "A", mean: 10, se: 0 }],
+        },
+      ],
+      ["A", "B"]
+    )[1][2][1]
+  ).toBe(10);
+});
 
-
-expect(stackerD3([{
-  key:"10",
-  values:[{bin:10,group: "A", mean: 0, se: 0}]
-},
-{
-  key:"20",
-  values:[{bin:20,group: "A", mean: 0, se: 0}]
-},
-{
-  key:"30",
-  values:[{bin:30,group: "A", mean: 10, se: 0}]
-}
-],["A","B"])[1][2][1]).toBe(10)
-
-})
-
-
-test("create numeric array with same length of given array",()=>
-expect(numericGroups(["A","B"])).toStrictEqual([0,1]))
+test("create numeric array with same length of given array", () =>
+  expect(numericGroups(["A", "B"])).toStrictEqual([0, 1]));
 
 test("flatten the group data into a dataset with group name ", () => {
   expect(
@@ -646,126 +561,81 @@ test("flatten the group data into a dataset with group name ", () => {
   ]);
 });
 
-
-test("create data from raw bird data and effort until birds/100nh by effort", () => {
-  expect(
-    createD3Data(
-      [
-        { cloaca: "A", effort_id: 2 },
-        { cloaca: "B", effort_id: 2 },
-        { cloaca: "A", effort_id: 3 },
-        { cloaca: "A", effort_id: 3 },
-      ],
-      ["cloaca"],
-      [
-        { effort_id: 2, date: "11/01/1991", nethours: 10 },
-        { effort_id: 3, date: "11/01/1992", nethours: 20 },
-      ],
-      [10, 20, 30]
-    )
-  ).toStrictEqual({data:[
-    {
-      group: "A",
-      data: [
-        {
-          effort_id: 2,
-          julian: 305,
-          bin: 30,
-          date: "11/01/1991",
-          nethours: 10,
-          birdnhour: 10,
-          data: [{ cloaca: "A", effort_id: 2, group: "A" }],
-        },
-        {
-          effort_id: 3,
-          julian: 306,
-          bin: 30,
-          date: "11/01/1992",
-          nethours: 20,
-          birdnhour: 10,
-          data: [
-            { cloaca: "A", effort_id: 3, group: "A" },
-            { cloaca: "A", effort_id: 3, group: "A" },
-          ],
-        },
-      ],
-    },
-
-    {
-      group: "B",
-      data: [
-        {
-          effort_id: 2,
-          julian: 305,
-          bin: 30,
-          date: "11/01/1991",
-          nethours: 10,
-          birdnhour: 10,
-          data: [{ cloaca: "B", effort_id: 2, group: "B" }],
-        },
-      ],
-    },
-  ],groups:["A","B"]});
-});
-
-
+// JSON.stringfy necessary here
 test("new d3", () => {
   expect(
-    newCreateD3(
-      [
-        { cloaca: "A", effort_id: 2 },
-        { cloaca: "B", effort_id: 2 },
-        { cloaca: "A", effort_id: 3 },
-        { cloaca: "A", effort_id: 3 },
-      ],
-      ["cloaca"],
-      [
-        { effort_id: 2, date: "01/01/1991", nethours: 10 },
-        { effort_id: 3, date: "11/01/1992", nethours: 20 },
-      ],
-      [1,10, 20, 30]
+    JSON.stringify(
+      newCreateD3(
+        [
+          { cloaca: "A", effort_id: 2 },
+          { cloaca: "B", effort_id: 2 },
+          { cloaca: "A", effort_id: 3 },
+          { cloaca: "A", effort_id: 3 },
+        ],
+        ["cloaca"],
+        [
+          { effort_id: 2, date: "01/01/1991", nethours: 10 },
+          { effort_id: 3, date: "11/01/1992", nethours: 20 },
+        ],
+        [1, 10, 20, 30]
+      )
     )
-  ).toStrictEqual({data:[
-    {
-      group: "A",
-      data: [
-        {
-          effort_id: 2,
-          julian: 305,
-          bin: 30,
-          date: "11/01/1991",
-          nethours: 10,
-          birdnhour: 10,
-          data: [{ cloaca: "A", effort_id: 2, group: "A" }],
-        },
-        {
-          effort_id: 3,
-          julian: 306,
-          bin: 30,
-          date: "11/01/1992",
-          nethours: 20,
-          birdnhour: 10,
-          data: [
-            { cloaca: "A", effort_id: 3, group: "A" },
-            { cloaca: "A", effort_id: 3, group: "A" },
-          ],
-        },
+  ).toStrictEqual(
+    JSON.stringify({
+      stack: [
+        [
+          [0, 10],
+          [0, 0],
+          [0, 0],
+          [0, 10],
+        ],
+        [
+          [10, 20],
+          [0, 0],
+          [0, 0],
+          [10, 10],
+        ],
       ],
-    },
-
-    {
-      group: "B",
-      data: [
-        {
-          effort_id: 2,
-          julian: 305,
-          bin: 30,
-          date: "11/01/1991",
-          nethours: 10,
-          birdnhour: 10,
-          data: [{ cloaca: "B", effort_id: 2, group: "B" }],
-        },
+      groups: ["A", "B"],
+      flat: [
+        { group: "A", bin: 1, mean: 10, se: 0 },
+        { group: "B", bin: 1, mean: 10, se: 0 },
+        { group: "A", bin: 10, mean: 0, se: 0 },
+        { group: "B", bin: 10, mean: 0, se: 0 },
+        { group: "A", bin: 20, mean: 0, se: 0 },
+        { group: "B", bin: 20, mean: 0, se: 0 },
+        { group: "A", bin: 30, mean: 10, se: 0 },
+        { group: "B", bin: 30, mean: 0, se: 0 },
       ],
-    },
-  ],groups:["A","B"]});
+    })
+  );
 });
+
+test("filter effort by Station", () => {
+  expect(
+    filterStation(
+      [
+        { effort_id: 2, station: "HOME" },
+        { effort_id: 3, station: "HOME" },
+        { effort_id: 4, station: "PARK" },
+        { effort_id: 5, station: "PARK" },
+      ],
+      ["HOME"]
+    )
+  ).toStrictEqual([
+    { effort_id: 2, station: "HOME" },
+    { effort_id: 3, station: "HOME" },
+  ]);
+});
+
+test("extract effort_ids",()=>{
+  expect(getEffIds(   [ { effort_id: 2, station: "HOME" },
+  { effort_id: 3, station: "HOME" }])).toStrictEqual([2,3])
+})
+
+
+test("filter captures by effort_id",()=>{
+  expect(filterCaptures([{effort_id:2,group:"a"},{effort_id:3,group:"c"}],[2])).toStrictEqual([{effort_id:2,group:"a"}])
+
+})
+

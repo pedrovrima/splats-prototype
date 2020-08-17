@@ -10,6 +10,21 @@ const getGroups = (data, variable) => {
   return unique_values;
 };
 
+
+const filterStation = (effort_data,args)=>{
+ return effort_data.filter(datum=>args.indexOf(datum.station)>-1)
+}
+
+const getEffIds = (effort_data)=>effort_data.map(datum=>datum.effort_id)
+
+
+const filterCaptures = (capture_data,effort_ids)=>{
+    return capture_data.filter(datum=>effort_ids.indexOf(datum.effort_id)>-1 )
+}
+
+
+
+
 const organizeGroups = (data, variable) => {
   let groups = getGroups(data, variable);
   let group_data = groups.reduce((resu, group) => {
@@ -24,7 +39,7 @@ const createBins = (max, size) => {
   let number_of_bins = Math.ceil(max / size);
   let bins = [];
   for (let i = 0; i < number_of_bins; i++) {
-    bins.push(5 + i * size);
+    bins.push(1 + i * size);
   }
   return bins;
 };
@@ -110,14 +125,6 @@ const groupGroupper = (data, groups) => {
 
 const getBinData = (data, bin) => {
   return data.filter((datum) => datum.bin === bin);
-};
-
-const countBins = (data, bin) => {
-  return getBinData(data, bin).length;
-};
-
-const groupBinCounter = (group_data, bins) => {
-  return bins.map((bin) => countBins(group_data, bin));
 };
 
 const getMean = (array) => {
@@ -283,10 +290,10 @@ function createD3Data(data, variables, effort_data, bins) {
   let nested_data = binNestter(flatten(d3_grouppes));
 
   let stacked_data = stackerD3(nested_data, groupped_data.groups);
-  return {
+  return {    flat: flatten(d3_grouppes),
+
     stack: stacked_data,
     groups: groupped_data.groups,
-    flat: flatten(d3_grouppes),
   };
 }
 
@@ -330,6 +337,7 @@ function newCreateD3(data, variables, effort_data, bins) {
   let nested_data = binNestter(flatten(binData));
 
   let stacked_data = stackerD3(nested_data, groups);
+  console.log(flatten(binData))
   return {
     stack: stacked_data,
     groups: groups,
@@ -352,7 +360,7 @@ function createPlot(divId, data, variables, effort_data, bins) {
     height = 400 - margin.top - margin.bottom;
 
   var d3Data = newCreateD3(data, variables, effort_data, bins);
-  console.log(d3Data)
+  console.log(d3Data);
   var svg = d3
     .select(divId)
     .append("svg")
@@ -366,12 +374,12 @@ function createPlot(divId, data, variables, effort_data, bins) {
   svg
     .append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(xAxis).ticks(365/5));
+    .call(d3.axisBottom(xAxis).ticks(365 / 5));
 
-    var ticks = d3.selectAll(".tick text");
-ticks.each(function(_,i){
-    if(i%2 !== 0) d3.select(this).remove();
-});
+  var ticks = d3.selectAll(".tick text");
+  ticks.each(function (_, i) {
+    if (i % 2 !== 0) d3.select(this).remove();
+  });
 
   const yAxis = d3
     .scaleLinear()
@@ -397,7 +405,6 @@ ticks.each(function(_,i){
       "#0000FFFF",
       "#FF00FFFF",
     ]);
-
 
   // Show the areas
   svg
@@ -425,39 +432,44 @@ ticks.each(function(_,i){
         })
     );
 
-
-    svg.selectAll("mydots")
+  svg
+    .selectAll("mydots")
     .data(d3Data.groups)
     .enter()
     .append("circle")
-      .attr("cx", width)
-      .attr("cy", function(d,i){ return 100 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
-      .attr("r", 7)
-      .style("fill", function(d){ return color(d)})
-      .style("stroke","black")
-  
+    .attr("cx", width)
+    .attr("cy", function (d, i) {
+      return 100 + i * 25;
+    }) // 100 is where the first dot appears. 25 is the distance between dots
+    .attr("r", 7)
+    .style("fill", function (d) {
+      return color(d);
+    })
+    .style("stroke", "black");
+
   // Add one dot in the legend for each name.
-  svg.selectAll("mylabels")
+  svg
+    .selectAll("mylabels")
     .data(d3Data.groups)
     .enter()
     .append("text")
-      .attr("x", width+10)
-      .attr("y", function(d,i){ return 105 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
-      .style("fill", "black")
-      .text(function(d){ return d})
-      .attr("text-anchor", "left")
-      .style("alignment-baseline", "middle")
-
-
+    .attr("x", width + 10)
+    .attr("y", function (d, i) {
+      return 105 + i * 25;
+    }) // 100 is where the first dot appears. 25 is the distance between dots
+    .style("fill", "black")
+    .text(function (d) {
+      return d;
+    })
+    .attr("text-anchor", "left")
+    .style("alignment-baseline", "middle");
 }
 
-
-function updateData (divId, data, variables, effort_data, bins){
+function updateData(divId, data, variables, effort_data, bins) {
   var margin = { top: 10, right: 30, bottom: 30, left: 60 },
     width = 1000 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
   var newd3Data = newCreateD3(data, variables, effort_data, bins);
-
 
   const xAxis = d3.scaleLinear().domain([0, 365]).range([0, width]);
 
@@ -471,15 +483,17 @@ function updateData (divId, data, variables, effort_data, bins){
     ])
     .range([height, 0]);
 
-  var svg = d3
-    .select(divId)
+  var svg = d3.select(divId);
 
-    var paths = svg.select("g").selectAll("path.area").data(newd3Data.stack)
-    paths.exit().remove();//remove unneeded circles
-    paths.enter().append("path")
-    console.log(paths)
-    
-    paths.transition().duration(0).attr(
+  var paths = svg.select("g").selectAll("path.area").data(newd3Data.stack);
+  paths.exit().remove(); //remove unneeded circles
+  paths.enter().append("path");
+  console.log(paths);
+
+  paths
+    .transition()
+    .duration(0)
+    .attr(
       "d",
       d3
         .area()
@@ -493,11 +507,9 @@ function updateData (divId, data, variables, effort_data, bins){
           return yAxis(d[1]);
         })
     );
-
-
 }
 
-export default {
+module.exports= {
   onlyUnique,
   getGroups,
   organizeGroups,
@@ -513,8 +525,7 @@ export default {
   dateCreator,
   groupFinder,
   groupGroupper,
-  countBins,
-  groupBinCounter,
+  
   getMean,
   getStandardDeviation,
   getStandardError,
@@ -537,5 +548,9 @@ export default {
   createD3Data,
   createPlot,
   newCreateD3,
-  updateData
+  updateData,
+  filterStation,
+  filterCaptures,
+  getEffIds
+
 };
