@@ -7,6 +7,13 @@ import plot_functions from "./functions/graph_functions"
 import useDidMountEffect from "./didMountHook";
 
 function App() {
+  const stationUpdater = station =>      plot_functions.updateStations(
+    refs.current,
+    capture_data,
+    groupVariables,
+    station,
+    createBins(365, binSize))
+
   let stations = [...new Set(effort_data.map(eff=>eff.station)) ].sort()
   console.log(stations)
   let [binSize, setBinSize] = useState(10);
@@ -42,16 +49,24 @@ function App() {
     setEffortData(functions.filterStation(effort_data, selectedStations));
   }, [selectedStations]);
 
-  useEffect(() => {
-    
-    plot_functions.updateData(
+
+  useDidMountEffect(() => {
+    plot_functions.updateStatic(
       refs.current,
       capture_data,
       groupVariables,
       effortData,
       createBins(365, binSize)
     );
-  }, [binSize, groupVariables, effortData]);
+  }, [binSize,groupVariables]);
+
+
+  useEffect(() => {
+   stationUpdater(effortData)
+  }, [effortData]);
+
+
+
 
   useEffect(() => {
     if (refs.current) {
@@ -65,6 +80,7 @@ function App() {
       );
     }
   }, []);
+
 
   return (
     <div>
