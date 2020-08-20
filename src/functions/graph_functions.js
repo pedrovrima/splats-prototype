@@ -89,6 +89,7 @@ const yAxis = (data, height) =>
 function createPlot(divId, data, variables, effort_data, bins) {
    const c_dimension=container_dimensions()
   const dimensions = plot_dimensions(c_dimension, margins());
+  console.log(dimensions)
 
   var d3Data = functions.newCreateD3(data, variables, effort_data, bins);
 
@@ -107,7 +108,7 @@ function createPlot(divId, data, variables, effort_data, bins) {
   //   creates x axis
   svg
     .append("g")
-    .attr("transform", "translate(0," + c_dimension.height + ")")
+    .attr("transform", "translate(0," + (dimensions.height) + ")")
     .call(d3.axisBottom(xAxis(dimensions.width)).ticks(365 / 5));
 
   //   hides ticks
