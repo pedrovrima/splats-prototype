@@ -1,6 +1,6 @@
+import functions from "./index"
+
 const d3 = require("d3");
-const functions = require("./index");
-console.log(functions);
 
 const container_dimensions = (width = 1000, height = 400) => {
   return { width, height };
@@ -282,4 +282,4 @@ function updateStatic(divId, data, variables, effort_data, bins) {
   );
 }
 
-module.exports = { updateStations, createPlot, updateStatic };
+export default { updateStations, createPlot, updateStatic };

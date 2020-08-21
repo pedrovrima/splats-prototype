@@ -329,7 +329,7 @@ function groupFlatter(data, bin) {
 
 
 
-module.exports = {
+export default {
   onlyUnique,
   getGroups,
   organizeGroups,
