@@ -5,12 +5,12 @@ import capture_data from "./data/capture";
 import functions from "./functions";
 import plot_functions from "./functions/graph_functions"
 import useDidMountEffect from "./didMountHook";
-
+import regions_data from "./data/regions"
 function App() {
   const stationUpdater = station =>      plot_functions.updateStations(
     refs.current,
     capture_data,
-    groupVariables,
+    groupVariables.sort(),
     station,
     createBins(365, binSize))
 
@@ -18,23 +18,43 @@ function App() {
   console.log(stations)
   let [binSize, setBinSize] = useState(10);
   let [groupVariables, setGroupVariables] = useState(["AgeClass", "SexClass"]);
-  let [selectedStations, setSelectedStations] = useState([]);
+  let [selectedStations, setSelectedStations] = useState(["PARK", "JACR", "HOME", "NAVR", "CABL","GATE","GELL","HOUS","KAHN","LEST","MOMA","SAC2","SACR","SHAY"]);
   let [effortData, setEffortData] = useState(
     functions.filterStation(effort_data, selectedStations)
   );
   let [captureData, setCaptureData] = useState(
     functions.filterCaptures(capture_data, functions.getEffortIds(effortData))
   );
+
+  
   let refs = useRef(null);
   const updateBinSize = (bin) => {
     setBinSize(bin);
   };
+
+
+  const checker = (arr, target) => target.every(v => arr.includes(v));
 
   const stationChecker = (stations, station_name) => {
     stations.indexOf(station_name) < 0
       ? setSelectedStations([...stations, station_name])
       : setSelectedStations(stations.filter((stat) => stat !== station_name));
   };
+
+  const variableChecker = (selectedVars, variable) => {
+    selectedVars.indexOf(variable) < 0
+      ? setGroupVariables([...selectedVars, variable])
+      : setGroupVariables(selectedVars.filter((stat) => stat !== variable));
+  };
+
+
+
+  const regionChecker = (stations, regions)=>{
+    !checker(stations,regions)? 
+    setSelectedStations([...new Set([...stations, ...regions])]):
+    setSelectedStations(stations.filter((stat) => !regions.includes(stat)))
+  
+  }
 
   const createBins = (max, size) => {
     let number_of_bins = Math.ceil(max / size);
@@ -54,7 +74,7 @@ function App() {
     plot_functions.updateStatic(
       refs.current,
       capture_data,
-      groupVariables,
+      groupVariables.sort(),
       effortData,
       createBins(365, binSize)
     );
@@ -90,28 +110,28 @@ function App() {
           style={{ margin: "10px" }}
         >{`${selectedStations} bin size=${binSize}`}</h2>
         <div ref={refs}> </div>
-        <h3>Bin size</h3>
-        <button type="button" onClick={() => updateBinSize(5)}>
+        <h3>Bin size (days)</h3>
+        <button className={`btn-add ${binSize===5?"btn-active":""}`} type="button" onClick={() => updateBinSize(5)}>
           {" "}
           5
         </button>
-        <button type="button" onClick={() => updateBinSize(10)}>
+        <button className={`btn-add ${binSize===10?"btn-active":""}`} type="button" onClick={() => updateBinSize(10)}>
           {" "}
           10
         </button>
-        <button type="button" onClick={() => updateBinSize(15)}>
+        <button className={`btn-add ${binSize===15?"btn-active":""}`} type="button" onClick={() => updateBinSize(15)}>
           {" "}
           15
         </button>
-        <button type="button" onClick={() => updateBinSize(30)}>
+        <button className={`btn-add ${binSize===30?"btn-active":""}`} type="button" onClick={() => updateBinSize(30)}>
           {" "}
           30
         </button>
-        <button type="button" onClick={() => updateBinSize(45)}>
+        <button className={`btn-add ${binSize===45?"btn-active":""}`} type="button" onClick={() => updateBinSize(45)}>
           {" "}
           45
         </button>
-        <button type="button" onClick={() => updateBinSize(60)}>
+        <button className={`btn-add ${binSize===60?"btn-active":""}`} type="button" onClick={() => updateBinSize(60)}>
           {" "}
           60
         </button>
@@ -119,26 +139,35 @@ function App() {
       <h3>Bird Classes</h3>
       <div>
 
-        <button type="button" onClick={() => setGroupVariables(["AgeClass"])}>
+        <button className={`btn-add ${checker(groupVariables,["AgeClass"])?"btn-active":""}`} type="button" onClick={() => variableChecker(groupVariables,"AgeClass")}>
           Age
         </button>
 
-        <button type="button" onClick={() => setGroupVariables(["SexClass"])}>
+        <button className={`btn-add ${checker(groupVariables,["SexClass"])?"btn-active":""}`} type="button" onClick={() => variableChecker(groupVariables,"SexClass")}>
           Sex
         </button>
 
-        <button
-          type="button"
-          onClick={() => setGroupVariables(["AgeClass", "SexClass"])}
-        >
-          Age and Sex
-        </button>
+       
       </div>
-      <h3>Stations</h3> <button type="button" onClick={()=>setSelectedStations([])}>remove all</button>
+      <h3>Regions</h3> <button className="btn-remove" type="button" onClick={()=>setSelectedStations([])}>remove all</button>
+      <div>
+        {regions_data.map(region=>{
+          return(
+            <button className={`btn-add ${checker(selectedStations,region.stations)?"btn-active":""}`} type="button" onClick={() => regionChecker(selectedStations, region.stations)}>
+            {region.region}
+          </button>
+  
+          )
+        })}
+
+      </div>
+
+
+      <h3>Stations</h3> <button className="btn-remove" type="button" onClick={()=>setSelectedStations([])}>remove all</button>
       <div>
         {stations.map(stat=>{
           return(
-            <button type="button" onClick={() => stationChecker(selectedStations, stat)}>
+            <button className={`btn-add ${checker(selectedStations,[stat])?"btn-active":""}`} type="button" onClick={() => stationChecker(selectedStations, stat)}>
             {stat}
           </button>
   

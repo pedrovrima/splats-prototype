@@ -1,4 +1,43 @@
 @tailwind base;
 @tailwind components;
+
+.btn-add {
+    @apply bg-teal-600 text-white font-bold py-2 m-2 px-2 w-20 h-12 rounded-lg }
+
+.btn-add:hover{
+    @apply shadow-inner bg-teal-400
+}
+
+
+
+
+.btn-remove {
+    @apply bg-red-700 text-white font-bold py-2 m-2 px-4 rounded 
+}
+
+.btn-remove:hover{
+    @apply bg-red-500
+}
+
+.btn-active{
+    @apply  bg-white border-teal-600 border-4 border-solid text-teal-600 w-20 h-12
+}
+
+
+
+h1 {
+    @apply text-3xl font-extrabold m-8
+}
+
+
+
+h2 {
+    @apply text-2xl font-bold m-8
+}
+
+
+h3 {
+    @apply text-xl font-bold m-8
+}
 @tailwind utilities;
 
