@@ -6,7 +6,17 @@ import functions from "./functions";
 import plot_functions from "./functions/graph_functions"
 import useDidMountEffect from "./didMountHook";
 import regions_data from "./data/regions"
+import {saveSvgAsPng} from "save-svg-as-png"
+import { saveAs } from 'file-saver';
+import saver from "./svg_download"
+const d3 = require("d3")
+  
 function App() {
+
+
+  
+
+
   const stationUpdater = station =>      plot_functions.updateStations(
     refs.current,
     capture_data,
@@ -28,6 +38,7 @@ function App() {
 
   
   let refs = useRef(null);
+  let buttonRef=useRef(null)
   const updateBinSize = (bin) => {
     setBinSize(bin);
   };
@@ -100,7 +111,21 @@ function App() {
       );
     }
   }, []);
+  
+ 
 
+const click= function(){
+  const svg = d3
+  .select("svg")
+  console.log(svg)
+  
+    var svgString = saver.getSVGString(svg.node());
+    saver.svgString2Image( svgString, 2*1000, 2*400, 'png', save ); // passes Blob and filesize String to the callback
+  
+    function save( dataBlob, filesize ){
+      saveAs( dataBlob, 'D3 vis exported to PNG.png' ); // FileSaver.js function
+    }
+  };
 
   return (
     <div>
@@ -109,7 +134,8 @@ function App() {
         <h2
           style={{ margin: "10px" }}
         >{`${selectedStations} bin size=${binSize}`}</h2>
-        <div ref={refs}> </div>
+        <div ref={refs} id="graph"> </div>
+        <button type="button" onClick={()=>click()}>Download</button>
         <h3>Bin size (days)</h3>
         <button className={`btn-add ${binSize===5?"btn-active":""}`} type="button" onClick={() => updateBinSize(5)}>
           {" "}

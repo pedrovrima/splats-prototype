@@ -74,12 +74,13 @@ const createLegend = (svg, data, color, dimensions) => {
       return 105 + i * 25;
     }) // 100 is where the first dot appears. 25 is the distance between dots
     .style("fill", "black")
-    .text(function (d) {
+        .text(function (d) {
       return d;
     })
     .attr("text-anchor", "left")
     .style("alignment-baseline", "middle")
-    .attr("class", "labels");
+    .attr("class", "labels")
+    .attr("font-family","Arial, Helvetica, sans-serif")
 };
 
 function createPlot(divId, data, variables, effort_data, bins) {
@@ -95,13 +96,22 @@ function createPlot(divId, data, variables, effort_data, bins) {
     .append("svg")
     .attr("width", container_dimensions().width)
     .attr("height", container_dimensions().height)
+
     .append("g")
     .attr(
       "transform",
       "translate(" + margins().left + "," + margins().top + ")"
     );
 
-  //   creates x axis
+    svg.append("rect")
+    .attr("width", container_dimensions().width)
+    .attr("height", container_dimensions().height)
+    .attr("fill", "white")
+    .attr(
+      "transform",
+      "translate(-" + margins().left + ",-" + margins().top + ")"
+    );
+
   svg
     .append("g")
     .attr("transform", "translate(0," + dimensions.height + ")")
@@ -147,6 +157,7 @@ function createPlot(divId, data, variables, effort_data, bins) {
           return yAxis(d3Data, dimensions.height)(d[1]);
         })
     );
+
 
   createLegend(svg, d3Data, color, dimensions);
 }
