@@ -1,4 +1,4 @@
-import functions from "./index"
+import functions from "./index";
 
 const d3 = require("d3");
 
@@ -10,25 +10,40 @@ const margins = (top = 10, bottom = 30, left = 60, right = 60) => {
 };
 
 const plot_dimensions = (container_dimensions, margins) => {
-  console.log(container_dimensions);
   return {
     width: container_dimensions.width - margins.left - margins.right,
     height: container_dimensions.height - margins.bottom - margins.top,
   };
 };
 
+const opposites = (arr, l) => {
+  if (l >= arr.length) {
+    return arr;
+  } else {
+    let i = 0;
+    let colors = [];
+    while (i < l) {
+      let datum = i % 2 === 0 ? arr[Math.ceil(i / 2)] : arr[arr.length - i];
+      colors.push(datum);
+      i++;
+    }
+    return colors;
+  }
+};
+
+console.log(opposites([1, 2, 3, 4], 2));
+
 const create_color = (data) => {
+  console.log(data.groups);
   const color = d3
     .scaleOrdinal()
     .domain(data.groups)
-    .range([
-      "#FF0000FF",
-      "#FFFF00FF",
-      "#00FF00FF",
-      "#00FFFFFF",
-      "#0000FFFF",
-      "#FF00FFFF",
-    ]);
+    .range(
+      opposites(
+        ["#D64B4B", "#D6914B", "#D6D64B", "#4BD74B", "#4BD8D8", "#4C4CD9"],
+        data.groups.length
+      )
+    );
   return color;
 };
 
@@ -46,10 +61,28 @@ const yAxis = (data, height) =>
     .range([height, 0])
     .nice();
 
+const error_bar_func = (dimensions, data) =>
+  d3
+    .area()
+    .x(function (d, i) {
+      return xAxis(dimensions.width)(d.data.key);
+    })
+    .y1(function (d) {
+      return yAxis(
+        data,
+        dimensions.height
+      )(Math.max(functions.flatten(d.data.stack)) + +5);
+    })
+    .y0(function (d) {
+      return yAxis(
+        data,
+        dimensions.height
+      )(Math.max(functions.flatten(d.data.stack)) - +5);
+    });
+
 const createLegend = (svg, data, color, dimensions) => {
   const data_svg = svg.selectAll("mydots").data(data.groups);
 
-  console.log(data_svg);
   data_svg
     .enter()
     .append("circle")
@@ -74,19 +107,18 @@ const createLegend = (svg, data, color, dimensions) => {
       return 105 + i * 25;
     }) // 100 is where the first dot appears. 25 is the distance between dots
     .style("fill", "black")
-        .text(function (d) {
+    .text(function (d) {
       return d;
     })
     .attr("text-anchor", "left")
     .style("alignment-baseline", "middle")
     .attr("class", "labels")
-    .attr("font-family","Arial, Helvetica, sans-serif")
+    .attr("font-family", "Arial, Helvetica, sans-serif");
 };
 
 function createPlot(divId, data, variables, effort_data, bins) {
   const c_dimension = container_dimensions();
   const dimensions = plot_dimensions(c_dimension, margins());
-  console.log(dimensions);
 
   const d3Data = functions.newCreateD3(data, variables, effort_data, bins);
 
@@ -103,7 +135,8 @@ function createPlot(divId, data, variables, effort_data, bins) {
       "translate(" + margins().left + "," + margins().top + ")"
     );
 
-    svg.append("rect")
+  svg
+    .append("rect")
     .attr("width", container_dimensions().width)
     .attr("height", container_dimensions().height)
     .attr("fill", "white")
@@ -158,6 +191,69 @@ function createPlot(divId, data, variables, effort_data, bins) {
         })
     );
 
+  const errorData = d3Data.stack[d3Data.stack.length - 1].map((stac, i) => [
+    { data: stac.data, value: stac[1], se: d3Data.ses[i] },
+  ]);
+
+  var errorBars = svg.selectAll("path.errorBar").data(errorData);
+  errorBars
+    .enter()
+    .append("path")
+    .attr("class", "errorBar")
+    .attr(
+      "d",
+      d3
+        .area()
+        .x(function (d, i) {
+          return xAxis(dimensions.width)(d.data.key);
+        })
+        .y0((d, i) => yAxis(d3Data, dimensions.height)(d.value - d.se))
+        .y1((d, i) => yAxis(d3Data, dimensions.height)(d.value + d.se))
+    )
+
+    .attr("stroke", "red")
+    .attr("stroke-width", 1.5);
+
+  errorBars
+    .enter()
+    .append("path")
+    .attr("class", "errorBar")
+    .attr(
+      "d",
+      d3
+        .area()
+        .x0(function (d, i) {
+          return xAxis(dimensions.width)(d.data.key - 2);
+        })
+        .x1(function (d, i) {
+          return xAxis(dimensions.width)(+d.data.key + 2);
+        })
+        .y((d, i) => {
+          console.log(yAxis(d3Data, dimensions.height)(+d.se + d.value));
+          return yAxis(d3Data, dimensions.height)(+d.se + d.value);
+        })
+    )
+    .attr("stroke", "red")
+    .attr("stroke-width", 1.5);
+
+  errorBars
+    .enter()
+    .append("path")
+    .attr("class", "errorBar")
+    .attr(
+      "d",
+      d3
+        .area()
+        .x0(function (d, i) {
+          return xAxis(dimensions.width)(d.data.key - 2);
+        })
+        .x1(function (d, i) {
+          return xAxis(dimensions.width)(+d.data.key + 2);
+        })
+        .y((d, i) => yAxis(d3Data, dimensions.height)(d.value - d.se))
+    )
+    .attr("stroke", "red")
+    .attr("stroke-width", 1.5);
 
   createLegend(svg, d3Data, color, dimensions);
 }
@@ -171,6 +267,7 @@ function updatePath(svg, d3data, dimension) {
     .attr("class", "area")
     .style("fill", function (d) {
       const name = d3data.groups[d.key];
+      console.log(create_color(d3data));
       return create_color(d3data)(name);
     })
     .attr(
@@ -181,11 +278,9 @@ function updatePath(svg, d3data, dimension) {
           return xAxis(dimension.width)(d.data.key);
         })
         .y0(function (d) {
-          console.log(d, d3data);
           return yAxis(d3data, dimension.height)(d[0]);
         })
         .y1(function (d) {
-          console.log(d3data);
           return yAxis(d3data, dimension.height)(d[1]);
         })
     );
@@ -194,13 +289,86 @@ function updatePath(svg, d3data, dimension) {
 }
 
 function updateStations(divId, data, variables, effort_data, bins) {
-     const dimension = plot_dimensions(container_dimensions(), margins());
+  const dimension = plot_dimensions(container_dimensions(), margins());
 
   const newd3Data = functions.newCreateD3(data, variables, effort_data, bins);
   const svg = d3.select(divId);
   svg
-  .selectAll("g.yaxis")
-  .call(d3.axisLeft(yAxis(newd3Data, dimension.height)));
+    .selectAll("g.yaxis")
+    .call(d3.axisLeft(yAxis(newd3Data, dimension.height)));
+
+  const newerrorData = newd3Data.stack[
+    newd3Data.stack.length - 1
+  ].map((stac, i) => [
+    { data: stac.data, value: stac[1], se: newd3Data.ses[i] },
+  ]);
+
+  var errorBars = svg
+    .select("g")
+    .selectAll("path.errorBar")
+    .data(newerrorData, (d) => d[0].value);
+  errorBars.exit().remove();
+
+  errorBars
+    .enter()
+    .append("path")
+    .attr("class", "errorBar")
+    .transition()
+    .duration(1000)
+    .attr(
+      "d",
+      d3
+        .area()
+        .x(function (d, i) {
+          return xAxis(dimension.width)(d.data.key);
+        })
+        .y0((d, i) => yAxis(newd3Data, dimension.height)(d.value - d.se))
+        .y1((d, i) => yAxis(newd3Data, dimension.height)(d.value + d.se))
+    )
+
+    .attr("stroke", "red")
+    .attr("stroke-width", 1.5);
+
+  errorBars
+    .enter()
+    .append("path")
+    .attr("class", "errorBar")
+    .attr(
+      "d",
+      d3
+        .area()
+        .x0(function (d, i) {
+          return xAxis(dimension.width)(d.data.key - 2);
+        })
+        .x1(function (d, i) {
+          return xAxis(dimension.width)(+d.data.key + 2);
+        })
+        .y((d, i) => {
+          console.log(yAxis(newd3Data, dimension.height)(+d.se + d.value));
+          return yAxis(newd3Data, dimension.height)(+d.se + d.value);
+        })
+    )
+    .attr("stroke", "red")
+    .attr("stroke-width", 1.5);
+
+  errorBars
+    .enter()
+    .append("path")
+    .attr("class", "errorBar")
+    .attr(
+      "d",
+      d3
+        .area()
+        .x0(function (d, i) {
+          return xAxis(dimension.width)(d.data.key - 2);
+        })
+        .x1(function (d, i) {
+          return xAxis(dimension.width)(+d.data.key + 2);
+        })
+        .y((d, i) => yAxis(newd3Data, dimension.height)(d.value - d.se))
+    )
+    .attr("stroke", "red")
+    .attr("stroke-width", 1.5);
 
   const paths = updatePath(svg, newd3Data, dimension);
 
@@ -252,7 +420,10 @@ function updateStatic(divId, data, variables, effort_data, bins) {
 
   textRemove.exit().remove();
 
-  const textAdd = svg.select("g").selectAll("text.labels").data(newd3Data.groups);
+  const textAdd = svg
+    .select("g")
+    .selectAll("text.labels")
+    .data(newd3Data.groups);
 
   svg
     .selectAll("g.yaxis")

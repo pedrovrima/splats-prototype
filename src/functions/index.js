@@ -36,7 +36,7 @@ const createBins = (max, size) => {
   let number_of_bins = Math.ceil(max / size);
   let bins = [];
   for (let i = 0; i < number_of_bins; i++) {
-    bins.push(1 + i * size);
+    bins.push(5 + i * size);
   }
   return bins;
 };
@@ -44,9 +44,9 @@ const createBins = (max, size) => {
 const findBin = (value, bins) => {
   let correctBin = bins.filter((bin, i) => {
     if (i + 1 < bins.length) {
-      return value >= bin && value < bins[i + 1];
+      return value <= bin+5 && value > bins[i - 1]-5;
     } else {
-      return value >= bin;
+      return value <= bin;
     }
   });
   return correctBin[0];
@@ -264,6 +264,15 @@ function flatten(arr) {
   }, []);
 }
 
+function SEcalculator(group_data, data) {
+  if (group_data.data.length > 0) {
+    return (2* 100 * Math.sqrt(Math.pow(0.5,2)*data.sqr_nh*Math.pow(group_data.data.length,2)/
+    Math.pow(data.total_nh,4)+(group_data.data.length/ Math.pow(data.total_nh,3))));
+  } else {
+    return 0;
+  }
+}
+
 function newNHcalculator(group_data, data) {
   if (group_data.data.length > 0) {
     return (100 * group_data.data.length) / data.total_nh;
@@ -275,15 +284,19 @@ function newNHcalculator(group_data, data) {
 
 
 
+
 function newCreateD3(full_data, variables, effort_data, bins) {
+  
 
   let data_with_group = full_data.map((datum) => dataGroupper(datum, variables));
   let groups = getGroups(data_with_group, "group").sort();
   // console.time("part2");
   let filtered_data=filterCaptures(data_with_group, getEffortIds(effort_data))
-  console.log(filtered_data)
   let nethour_data = groupNetHourFlatter2(filtered_data, effort_data);
   // console.timeEnd("part2");
+  console.log(nethour_data[0])
+  console.log(binner({date:"5/14/2008"},createBins(365,10)),binner({date:"5/19/1995"},createBins(365,10)))
+
   let binned_data = nethour_data.map((datum) => binner(datum, bins));
   let binsGroupped = bins.map((bin) => {
     let this_bin_data = binned_data.filter((datum) => datum.bin === bin);
@@ -291,11 +304,15 @@ function newCreateD3(full_data, variables, effort_data, bins) {
       (sum, datum) => sum + datum.nethours,
       0
     );
+    let srq_this_bin_nethours = this_bin_data.reduce(
+      (sum, datum) => sum + Math.pow(datum.nethours,2),
+      0
+    );
     let this_bin_grouped_data = groupGroupper(
       flatten(this_bin_data.map((datum) => datum.data)),
       groups
     );
-    return { bin, data: this_bin_grouped_data, total_nh: this_bin_nethours };
+    return { bin, data: this_bin_grouped_data, total_nh: this_bin_nethours, sqr_nh:srq_this_bin_nethours };
   });
   let binData = binsGroupped.map((datum) => {
     let groupMean = datum.data.map((group_datum) => {
@@ -303,15 +320,22 @@ function newCreateD3(full_data, variables, effort_data, bins) {
         group: group_datum.group,
         bin: datum.bin,
         mean: newNHcalculator(group_datum, datum),
-        se: 0,
+        se: SEcalculator(group_datum, datum),
       };
     });
     return groupMean;
   });
+
+  let ses = binData.map(datum=>{
+  
+    return Math.sqrt(datum.reduce((sum,val)=>{return sum+Math.pow(val.se,2)},0))
+  })
+
   let nested_data = binNestter(flatten(binData));
 
   let stacked_data = stackerD3(nested_data, groups);
   return {
+    ses,
     stack: stacked_data,
     groups: groups,
     flat: flatten(binData),
