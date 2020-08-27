@@ -22,7 +22,7 @@ function App() {
     capture_data,
     groupVariables.sort(),
     station,
-    createBins(365, binSize))
+    createBins(365, binSize),effrefs.current)
 
   let stations = [...new Set(effort_data.map(eff=>eff.station)) ].sort()
   console.log(stations)
@@ -38,6 +38,8 @@ function App() {
 
   
   let refs = useRef(null);
+  let effrefs = useRef(null);
+
   let buttonRef=useRef(null)
   const updateBinSize = (bin) => {
     setBinSize(bin);
@@ -87,7 +89,8 @@ function App() {
       capture_data,
       groupVariables.sort(),
       effortData,
-      createBins(365, binSize)
+      createBins(365, binSize),
+      effrefs.current
     );
   }, [binSize,groupVariables]);
 
@@ -107,7 +110,8 @@ function App() {
         groupVariables,
 
         effortData,
-        createBins(365, binSize)
+        createBins(365, binSize),
+        effrefs.current
       );
     }
   }, []);
@@ -135,6 +139,8 @@ const click= function(){
           style={{ margin: "10px" }}
         >{`${selectedStations} bin size=${binSize}`}</h2>
         <div ref={refs} id="graph"> </div>
+        <div ref={effrefs} id="graph"> </div>
+
         <button type="button" className={"btn-add-flex"} onClick={()=>click()}>Download</button>
         <h3>Bin size (days)</h3>
         <button className={`btn-add ${binSize===5?"btn-active":""}`} type="button" onClick={() => updateBinSize(5)}>

@@ -31,17 +31,11 @@ const opposites = (arr, l) => {
   }
 };
 
-console.log(opposites([1, 2, 3, 4], 2));
-
 const create_color = (data) => {
-  console.log(data.groups);
   const color = d3
     .scaleOrdinal()
     .domain(data.groups)
-    .range(
-        ["#D64B4B", "#D6914B", "#D6D64B", "#4BD74B", "#4BD8D8", "#4C4CD9"]
-      
-    );
+    .range(["#D64B4B", "#D6914B", "#D6D64B", "#4BD74B", "#4BD8D8", "#4C4CD9"]);
   return color;
 };
 
@@ -114,12 +108,146 @@ const createLegend = (svg, data, color, dimensions) => {
     .attr("font-family", "Arial, Helvetica, sans-serif");
 };
 
-function createPlot(divId, data, variables, effort_data, bins) {
+const createEffort = (data, effDiv, width) => {
+  var margin = { top: 30, right: 30, bottom: 70, left: 60 },
+    height = 200 - margin.top - margin.bottom;
+
+  var svg = d3
+    .select(effDiv)
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // Parse the Data
+  let allNh = data.map((d) => d.value);
+
+  // X axis
+  var x = d3
+    .scaleBand()
+    .range([0, width])
+    .domain(
+      data.map(function (d) {
+        return d.group;
+      })
+    )
+    .padding(0.2);
+  svg
+    .append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .attr("class", "effortX")
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+    .attr("transform", "translate(-10,0)rotate(-45)")
+    .style("text-anchor", "end");
+
+  // Add Y axis
+  var y = d3
+    .scaleLinear()
+    .domain([0, Math.max(...allNh)])
+    .range([height, 0]);
+  svg
+    .append("g")
+    .attr("class", "effortY")
+
+    .call(d3.axisLeft(y));
+
+  // Bars
+  svg
+    .append("g")
+    .attr("class", "bars")
+    .selectAll()
+    .data(data)
+
+    .enter()
+
+    .append("rect")
+    .attr("x", function (d) {
+      return x(d.group);
+    })
+    .attr("y", function (d) {
+      return y(d.value);
+    })
+    .attr("width", x.bandwidth())
+    .attr("height", function (d) {
+      return height - y(d.value);
+    })
+    .attr("fill", "#69b3a2");
+};
+
+const updateEffort = (data, effDiv, width) => {
+  var margin = { top: 30, right: 30, bottom: 70, left: 60 },
+    height = 200 - margin.top - margin.bottom;
+
+  var svg = d3.select(effDiv);
+
+  // Parse the Data
+  let allNh = data.map((d) => d.value);
+
+  // X axis
+  var x = d3
+    .scaleBand()
+    .range([0, width])
+    .domain(
+      data.map(function (d) {
+        return d.group;
+      })
+    )
+    .padding(0.2);
+
+  let xaxis = svg.select("g.effortX");
+  xaxis.transition().duration(1000).call(d3.axisBottom(x));
+
+  // Add Y axis
+  var y = d3
+    .scaleLinear()
+    .domain([0, Math.max(...allNh)])
+    .range([height, 0]);
+
+  svg.select("g.effortY").transition().duration(1000).call(d3.axisLeft(y));
+
+  // Bars
+  let bars = svg.select("g.bars").selectAll("rect");
+
+  bars.transition().duration(1000).attr("height", 0).attr("y", height);
+
+  svg
+    .select("g.bars")
+    .selectAll()
+    .data(data)
+
+    .enter()
+    .append("rect")
+    .merge(bars)
+    .transition()
+    .duration(1000)
+    .attr("x", function (d) {
+      return x(d.group);
+    })
+
+    .attr("width", x.bandwidth())
+    .attr("y", height)
+    .transition()
+    .duration(300)
+
+    .attr("height", function (d) {
+      return height - y(d.value);
+    })
+    .attr("y", function (d) {
+      return y(d.value);
+    })
+
+    .attr("fill", "#69b3a2");
+};
+
+function createPlot(divId, data, variables, effort_data, bins, effDiv) {
   const c_dimension = container_dimensions();
   const dimensions = plot_dimensions(c_dimension, margins());
 
   const d3Data = functions.newCreateD3(data, variables, effort_data, bins);
 
+  createEffort(d3Data.effortData, effDiv, dimensions.width);
   // creates plot area
   const svg = d3
     .select(divId)
@@ -227,7 +355,6 @@ function createPlot(divId, data, variables, effort_data, bins) {
           return xAxis(dimensions.width)(+d.data.key + 2);
         })
         .y((d, i) => {
-          console.log(yAxis(d3Data, dimensions.height)(+d.se + d.value));
           return yAxis(d3Data, dimensions.height)(+d.se + d.value);
         })
     )
@@ -284,12 +411,15 @@ function updatePath(svg, d3data, dimension) {
     );
 
   return paths;
+
 }
 
-function updateStations(divId, data, variables, effort_data, bins) {
+function updateStations(divId, data, variables, effort_data, bins, effDiv) {
   const dimension = plot_dimensions(container_dimensions(), margins());
 
   const newd3Data = functions.newCreateD3(data, variables, effort_data, bins);
+  updateEffort(newd3Data.effortData, effDiv, dimension.width);
+
   const svg = d3.select(divId);
   svg
     .selectAll("g.yaxis")
@@ -301,14 +431,11 @@ function updateStations(divId, data, variables, effort_data, bins) {
     { data: stac.data, value: stac[1], se: newd3Data.ses[i] },
   ]);
 
-  var errorBars = svg
-    .select("g")
-    .selectAll("path.errorBar")
-    .data([]);
+  var errorBars = svg.select("g").selectAll("path.errorBar").data([]);
   errorBars.exit().remove();
 
   errorBars
-  .data(newerrorData, (d) => d[0].value)
+    .data(newerrorData, (d) => d[0].value)
     .enter()
     .append("path")
     .attr("class", "errorBar")
@@ -329,7 +456,7 @@ function updateStations(divId, data, variables, effort_data, bins) {
     .attr("stroke-width", 1.5);
 
   errorBars
-  .data(newerrorData, (d) => d[0].value)
+    .data(newerrorData, (d) => d[0].value)
 
     .enter()
     .append("path")
@@ -348,7 +475,6 @@ function updateStations(divId, data, variables, effort_data, bins) {
           return xAxis(dimension.width)(+d.data.key + 2);
         })
         .y((d, i) => {
-          console.log(yAxis(newd3Data, dimension.height)(+d.se + d.value));
           return yAxis(newd3Data, dimension.height)(+d.se + d.value);
         })
     )
@@ -356,7 +482,7 @@ function updateStations(divId, data, variables, effort_data, bins) {
     .attr("stroke-width", 1.5);
 
   errorBars
-  .data(newerrorData, (d) => d[0].value)
+    .data(newerrorData, (d) => d[0].value)
 
     .enter()
     .append("path")
@@ -379,7 +505,7 @@ function updateStations(divId, data, variables, effort_data, bins) {
     .attr("stroke", "red")
     .attr("stroke-width", 1.5);
 
-  const paths = updatePath(svg, newd3Data, dimension);
+  const paths = updatePath(svg, newd3Data, dimension, 1);
 
   paths
     .transition()
@@ -400,14 +526,17 @@ function updateStations(divId, data, variables, effort_data, bins) {
     );
 }
 
-function updateStatic(divId, data, variables, effort_data, bins) {
+function updateStatic(divId, data, variables, effort_data, bins, effDiv) {
   const dimension = plot_dimensions(container_dimensions(), margins());
   const newd3Data = functions.newCreateD3(data, variables, effort_data, bins);
-
+  console.time("effort")
+  updateEffort(newd3Data.effortData, effDiv, dimension.width);
+console.timeEnd("effort")
   const svg = d3.select(divId);
-
+console.time("rest")
+console.time("path")
   const paths = updatePath(svg, newd3Data, dimension);
-
+console.timeEnd("path")
   const circles = svg.select("g").selectAll("circle").data(newd3Data.groups);
 
   circles.exit().remove();
@@ -456,82 +585,80 @@ function updateStatic(divId, data, variables, effort_data, bins) {
     .style("alignment-baseline", "middle");
 
   circles.transition().duration(1000);
+  console.time("error")
   const newerrorData = newd3Data.stack[
     newd3Data.stack.length - 1
   ].map((stac, i) => [
     { data: stac.data, value: stac[1], se: newd3Data.ses[i] },
   ]);
+  console.timeEnd("error")
+  var errorBars = svg.select("g").selectAll("path.errorBar").data([]);
+  errorBars.exit().remove();
 
-  var errorBars = svg
-  .select("g")
-  .selectAll("path.errorBar")
-  .data([]);
-errorBars.exit().remove();
+  errorBars
+    .data(newerrorData, (d) => d[0].value)
+    .enter()
+    .append("path")
+    .attr("class", "errorBar")
+    .attr(
+      "d",
+      d3
+        .area()
+        .x(function (d, i) {
+          return xAxis(dimension.width)(d.data.key);
+        })
+        .y0((d, i) => yAxis(newd3Data, dimension.height)(d.value - d.se))
+        .y1((d, i) => yAxis(newd3Data, dimension.height)(d.value + d.se))
+    )
 
-errorBars
-.data(newerrorData, (d) => d[0].value)
-  .enter()
-  .append("path")
-  .attr("class", "errorBar")
-  .attr(
-    "d",
-    d3
-      .area()
-      .x(function (d, i) {
-        return xAxis(dimension.width)(d.data.key);
-      })
-      .y0((d, i) => yAxis(newd3Data, dimension.height)(d.value - d.se))
-      .y1((d, i) => yAxis(newd3Data, dimension.height)(d.value + d.se))
-  )
+    .attr("stroke", "red")
+    .attr("stroke-width", 1.5);
 
-  .attr("stroke", "red")
-  .attr("stroke-width", 1.5);
+  errorBars
+    .data(newerrorData, (d) => d[0].value)
 
-errorBars
-.data(newerrorData, (d) => d[0].value)
+    .enter()
+    .append("path")
+    .attr("class", "errorBar")
+    .attr(
+      "d",
+      d3
+        .area()
+        .x0(function (d, i) {
+          return xAxis(dimension.width)(d.data.key - 2);
+        })
+        .x1(function (d, i) {
+          return xAxis(dimension.width)(+d.data.key + 2);
+        })
+        .y((d, i) => {
+          return yAxis(newd3Data, dimension.height)(+d.se + d.value);
+        })
+    )
+    .attr("stroke", "red")
+    .attr("stroke-width", 1.5);
 
-  .enter()
-  .append("path")
-  .attr("class", "errorBar")
-  .attr(
-    "d",
-    d3
-      .area()
-      .x0(function (d, i) {
-        return xAxis(dimension.width)(d.data.key - 2);
-      })
-      .x1(function (d, i) {
-        return xAxis(dimension.width)(+d.data.key + 2);
-      })
-      .y((d, i) => {
-        console.log(yAxis(newd3Data, dimension.height)(+d.se + d.value));
-        return yAxis(newd3Data, dimension.height)(+d.se + d.value);
-      })
-  )
-  .attr("stroke", "red")
-  .attr("stroke-width", 1.5);
+  errorBars
+    .data(newerrorData, (d) => d[0].value)
 
-errorBars
-.data(newerrorData, (d) => d[0].value)
+    .enter()
+    .append("path")
+    .attr("class", "errorBar")
+    .attr(
+      "d",
+      d3
+        .area()
+        .x0(function (d, i) {
+          return xAxis(dimension.width)(d.data.key - 2);
+        })
+        .x1(function (d, i) {
+          return xAxis(dimension.width)(+d.data.key + 2);
+        })
+        .y((d, i) => yAxis(newd3Data, dimension.height)(d.value - d.se))
+    )
+    .attr("stroke", "red")
+    .attr("stroke-width", 1.5);
 
-  .enter()
-  .append("path")
-  .attr("class", "errorBar")
-  .attr(
-    "d",
-    d3
-      .area()
-      .x0(function (d, i) {
-        return xAxis(dimension.width)(d.data.key - 2);
-      })
-      .x1(function (d, i) {
-        return xAxis(dimension.width)(+d.data.key + 2);
-      })
-      .y((d, i) => yAxis(newd3Data, dimension.height)(d.value - d.se))
-  )
-  .attr("stroke", "red")
-  .attr("stroke-width", 1.5);
-
+  console.timeEnd("rest")
   paths.attr(
     "d",
     d3
@@ -546,6 +673,7 @@ errorBars
         return yAxis(newd3Data, dimension.height)(d[1]);
       })
   );
+
 }
 
 export default { updateStations, createPlot, updateStatic };

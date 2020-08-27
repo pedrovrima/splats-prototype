@@ -290,12 +290,11 @@ function newCreateD3(full_data, variables, effort_data, bins) {
 
   let data_with_group = full_data.map((datum) => dataGroupper(datum, variables));
   let groups = getGroups(data_with_group, "group").sort();
-  // console.time("part2");
+  console.time("part2");
   let filtered_data=filterCaptures(data_with_group, getEffortIds(effort_data))
   let nethour_data = groupNetHourFlatter2(filtered_data, effort_data);
-  // console.timeEnd("part2");
-  console.log(nethour_data[0])
-  console.log(binner({date:"5/14/2008"},createBins(365,10)),binner({date:"5/19/1995"},createBins(365,10)))
+  console.timeEnd("part2");
+
 
   let binned_data = nethour_data.map((datum) => binner(datum, bins));
   let binsGroupped = bins.map((bin) => {
@@ -316,6 +315,7 @@ function newCreateD3(full_data, variables, effort_data, bins) {
   });
   let binData = binsGroupped.map((datum) => {
     let groupMean = datum.data.map((group_datum) => {
+      
       return {
         group: group_datum.group,
         bin: datum.bin,
@@ -323,15 +323,20 @@ function newCreateD3(full_data, variables, effort_data, bins) {
         se: SEcalculator(group_datum, datum),
       };
     });
-    return groupMean;
+    return {data:groupMean,nh:datum.total_nh,bin:datum.bin};
   });
 
+  console.time("new")
+  let justData= binData.map(datum=>datum.data)
+  let effortData = binData.map(datum=> {return {value:datum.nh,group:datum.bin}})
+  console.timeEnd("new")
+  
   let ses = binData.map(datum=>{
   
-    return Math.sqrt(datum.reduce((sum,val)=>{return sum+Math.pow(val.se,2)},0))
+    return Math.sqrt(datum.data.reduce((sum,val)=>{return sum+Math.pow(val.se,2)},0))
   })
 
-  let nested_data = binNestter(flatten(binData));
+  let nested_data = binNestter(flatten(justData));
 
   let stacked_data = stackerD3(nested_data, groups);
   return {
@@ -339,6 +344,7 @@ function newCreateD3(full_data, variables, effort_data, bins) {
     stack: stacked_data,
     groups: groups,
     flat: flatten(binData),
+    effortData
   };
 }
 
