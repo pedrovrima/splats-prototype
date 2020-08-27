@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/splats-prototype/static/css/main.6fc6b379.chunk.css",
-    "main.js": "/splats-prototype/static/js/main.894618c3.chunk.js",
-    "main.js.map": "/splats-prototype/static/js/main.894618c3.chunk.js.map",
+    "main.js": "/splats-prototype/static/js/main.91f0ea04.chunk.js",
+    "main.js.map": "/splats-prototype/static/js/main.91f0ea04.chunk.js.map",
     "runtime-main.js": "/splats-prototype/static/js/runtime-main.dc140329.js",
     "runtime-main.js.map": "/splats-prototype/static/js/runtime-main.dc140329.js.map",
-    "static/js/2.84000c12.chunk.js": "/splats-prototype/static/js/2.84000c12.chunk.js",
-    "static/js/2.84000c12.chunk.js.map": "/splats-prototype/static/js/2.84000c12.chunk.js.map",
+    "static/js/2.f09eb5dd.chunk.js": "/splats-prototype/static/js/2.f09eb5dd.chunk.js",
+    "static/js/2.f09eb5dd.chunk.js.map": "/splats-prototype/static/js/2.f09eb5dd.chunk.js.map",
     "index.html": "/splats-prototype/index.html",
-    "precache-manifest.19c8a99fd6a21e910be2ff9df602ae6b.js": "/splats-prototype/precache-manifest.19c8a99fd6a21e910be2ff9df602ae6b.js",
+    "precache-manifest.2c2e5297895863ac65e0fc1bc64868a5.js": "/splats-prototype/precache-manifest.2c2e5297895863ac65e0fc1bc64868a5.js",
     "service-worker.js": "/splats-prototype/service-worker.js",
     "static/css/main.6fc6b379.chunk.css.map": "/splats-prototype/static/css/main.6fc6b379.chunk.css.map",
-    "static/js/2.84000c12.chunk.js.LICENSE.txt": "/splats-prototype/static/js/2.84000c12.chunk.js.LICENSE.txt"
+    "static/js/2.f09eb5dd.chunk.js.LICENSE.txt": "/splats-prototype/static/js/2.f09eb5dd.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.dc140329.js",
-    "static/js/2.84000c12.chunk.js",
+    "static/js/2.f09eb5dd.chunk.js",
     "static/css/main.6fc6b379.chunk.css",
-    "static/js/main.894618c3.chunk.js"
+    "static/js/main.91f0ea04.chunk.js"
   ]
 }
