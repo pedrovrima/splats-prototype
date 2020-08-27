@@ -135,7 +135,7 @@ const click= function(){
           style={{ margin: "10px" }}
         >{`${selectedStations} bin size=${binSize}`}</h2>
         <div ref={refs} id="graph"> </div>
-        <button type="button" onClick={()=>click()}>Download</button>
+        <button type="button" className={"btn-add-flex"} onClick={()=>click()}>Download</button>
         <h3>Bin size (days)</h3>
         <button className={`btn-add ${binSize===5?"btn-active":""}`} type="button" onClick={() => updateBinSize(5)}>
           {" "}

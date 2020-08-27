@@ -39,10 +39,8 @@ const create_color = (data) => {
     .scaleOrdinal()
     .domain(data.groups)
     .range(
-      opposites(
-        ["#D64B4B", "#D6914B", "#D6D64B", "#4BD74B", "#4BD8D8", "#4C4CD9"],
-        data.groups.length
-      )
+        ["#D64B4B", "#D6914B", "#D6D64B", "#4BD74B", "#4BD8D8", "#4C4CD9"]
+      
     );
   return color;
 };
@@ -306,10 +304,11 @@ function updateStations(divId, data, variables, effort_data, bins) {
   var errorBars = svg
     .select("g")
     .selectAll("path.errorBar")
-    .data(newerrorData, (d) => d[0].value);
+    .data([]);
   errorBars.exit().remove();
 
   errorBars
+  .data(newerrorData, (d) => d[0].value)
     .enter()
     .append("path")
     .attr("class", "errorBar")
@@ -330,9 +329,14 @@ function updateStations(divId, data, variables, effort_data, bins) {
     .attr("stroke-width", 1.5);
 
   errorBars
+  .data(newerrorData, (d) => d[0].value)
+
     .enter()
     .append("path")
     .attr("class", "errorBar")
+    .transition()
+    .duration(1000)
+
     .attr(
       "d",
       d3
@@ -352,9 +356,14 @@ function updateStations(divId, data, variables, effort_data, bins) {
     .attr("stroke-width", 1.5);
 
   errorBars
+  .data(newerrorData, (d) => d[0].value)
+
     .enter()
     .append("path")
     .attr("class", "errorBar")
+    .transition()
+    .duration(1000)
+
     .attr(
       "d",
       d3
@@ -447,6 +456,81 @@ function updateStatic(divId, data, variables, effort_data, bins) {
     .style("alignment-baseline", "middle");
 
   circles.transition().duration(1000);
+  const newerrorData = newd3Data.stack[
+    newd3Data.stack.length - 1
+  ].map((stac, i) => [
+    { data: stac.data, value: stac[1], se: newd3Data.ses[i] },
+  ]);
+
+  var errorBars = svg
+  .select("g")
+  .selectAll("path.errorBar")
+  .data([]);
+errorBars.exit().remove();
+
+errorBars
+.data(newerrorData, (d) => d[0].value)
+  .enter()
+  .append("path")
+  .attr("class", "errorBar")
+  .attr(
+    "d",
+    d3
+      .area()
+      .x(function (d, i) {
+        return xAxis(dimension.width)(d.data.key);
+      })
+      .y0((d, i) => yAxis(newd3Data, dimension.height)(d.value - d.se))
+      .y1((d, i) => yAxis(newd3Data, dimension.height)(d.value + d.se))
+  )
+
+  .attr("stroke", "red")
+  .attr("stroke-width", 1.5);
+
+errorBars
+.data(newerrorData, (d) => d[0].value)
+
+  .enter()
+  .append("path")
+  .attr("class", "errorBar")
+  .attr(
+    "d",
+    d3
+      .area()
+      .x0(function (d, i) {
+        return xAxis(dimension.width)(d.data.key - 2);
+      })
+      .x1(function (d, i) {
+        return xAxis(dimension.width)(+d.data.key + 2);
+      })
+      .y((d, i) => {
+        console.log(yAxis(newd3Data, dimension.height)(+d.se + d.value));
+        return yAxis(newd3Data, dimension.height)(+d.se + d.value);
+      })
+  )
+  .attr("stroke", "red")
+  .attr("stroke-width", 1.5);
+
+errorBars
+.data(newerrorData, (d) => d[0].value)
+
+  .enter()
+  .append("path")
+  .attr("class", "errorBar")
+  .attr(
+    "d",
+    d3
+      .area()
+      .x0(function (d, i) {
+        return xAxis(dimension.width)(d.data.key - 2);
+      })
+      .x1(function (d, i) {
+        return xAxis(dimension.width)(+d.data.key + 2);
+      })
+      .y((d, i) => yAxis(newd3Data, dimension.height)(d.value - d.se))
+  )
+  .attr("stroke", "red")
+  .attr("stroke-width", 1.5);
 
   paths.attr(
     "d",

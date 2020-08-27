@@ -4,6 +4,10 @@
 .btn-add {
     @apply bg-teal-600 text-white font-bold py-2 m-2 px-2 w-20 h-12 rounded-lg }
 
+
+    .btn-add-flex {
+        @apply bg-teal-600 text-white font-bold py-2 m-2 px-2 rounded-lg }
+    
 .btn-add:hover{
     @apply shadow-inner bg-teal-400
 }
