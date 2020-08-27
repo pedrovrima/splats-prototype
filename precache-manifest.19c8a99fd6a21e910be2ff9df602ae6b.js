@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "acc021238496ab775a54ad8d5c5b1d8f",
+    "revision": "b3c7573bec418b91a9be3dd338c27b15",
     "url": "/splats-prototype/index.html"
   },
   {
-    "revision": "e3fde4e15f0749eda567",
+    "revision": "0111fb8c009834d6cecd",
     "url": "/splats-prototype/static/css/main.6fc6b379.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/splats-prototype/static/js/2.84000c12.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "e3fde4e15f0749eda567",
-    "url": "/splats-prototype/static/js/main.f01d094e.chunk.js"
+    "revision": "0111fb8c009834d6cecd",
+    "url": "/splats-prototype/static/js/main.894618c3.chunk.js"
   },
   {
     "revision": "3cf34b869847b055294c",
