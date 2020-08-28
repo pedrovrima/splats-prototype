@@ -1,4 +1,6 @@
 import functions from "./index";
+import {createEffort,updateEffort} from "./effort_plot"
+import {default_dimensions} from "./plot_parts"
 
 const d3 = require("d3");
 
@@ -108,134 +110,7 @@ const createLegend = (svg, data, color, dimensions) => {
     .attr("font-family", "Arial, Helvetica, sans-serif");
 };
 
-const createEffort = (data, effDiv, width) => {
-  var margin = { top: 30, right: 30, bottom: 70, left: 60 },
-    height = 200 - margin.top - margin.bottom;
 
-  var svg = d3
-    .select(effDiv)
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  // Parse the Data
-  let allNh = data.map((d) => d.value);
-
-  // X axis
-  var x = d3
-    .scaleLinear()
-    .domain(
-      [0,365]
-          )  
-    .range([0, width])
-
-    svg
-    .append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .attr("class", "effortX")
-    .call(d3.axisBottom(x)    .ticks(365 / 5)
-    )
-
-    .selectAll("text")
-    .attr("transform", "translate(-10,0)rotate(-45)")
-    .style("text-anchor", "end");
-
-  // Add Y axis
-  var y = d3
-    .scaleLinear()
-    .domain([0, Math.max(...allNh)])
-    .range([height, 0]);
-  svg
-    .append("g")
-    .attr("class", "effortY")
-
-    .call(d3.axisLeft(y));
-
-  // Bars
-  svg
-    .append("g")
-    .attr("class", "bars")
-    .selectAll()
-    .data(data)
-
-    .enter()
-
-    .append("rect")
-    .attr("x", function (d) {
-      return x(d.group);
-    })
-    .attr("y", function (d) {
-      return y(d.value);
-    })
-    .attr("width", 5)
-    .attr("height", function (d) {
-      return height - y(d.value);
-    })
-    .attr("fill", "#69b3a2");
-};
-
-const updateEffort = (data, effDiv, width) => {
-  var margin = { top: 30, right: 30, bottom: 70, left: 60 },
-    height = 200 - margin.top - margin.bottom;
-
-  var svg = d3.select(effDiv);
-
-  // Parse the Data
-  let allNh = data.map((d) => d.value);
-
-  // X axis
-  var x = d3
-    .scaleLinear()
-    .range([0, width])
-    .domain(
-[0,365]    )
-
-  let xaxis = svg.select("g.effortX");
-  xaxis.transition().duration(1000).call(d3.axisBottom(x));
-
-  // Add Y axis
-  var y = d3
-    .scaleLinear()
-    .domain([0, Math.max(...allNh)])
-    .range([height, 0]);
-
-  svg.select("g.effortY").transition().duration(1000).call(d3.axisLeft(y));
-
-  // Bars
-  let bars = svg.select("g.bars").selectAll("rect");
-
-  bars.transition().duration(1000).attr("height", 0).attr("y", height);
-
-  svg
-    .select("g.bars")
-    .selectAll()
-    .data(data)
-
-    .enter()
-    .append("rect")
-    .merge(bars)
-    .transition()
-    .duration(1000)
-    .attr("x", function (d) {
-      return x(d.group);
-    })
-
-    .attr("width", (30))
-    .attr("y", height)
-    .transition()
-    .duration(300)
-
-    .attr("height", function (d) {
-      return height - y(d.value);
-    })
-    .attr("y", function (d) {
-      return y(d.value);
-    })
-
-    .attr("fill", "#69b3a2");
-};
 
 function createPlot(divId, data, variables, effort_data, bins, effDiv) {
   const c_dimension = container_dimensions();
@@ -243,7 +118,7 @@ function createPlot(divId, data, variables, effort_data, bins, effDiv) {
 
   const d3Data = functions.newCreateD3(data, variables, effort_data, bins);
 
-  createEffort(d3Data.effortData, effDiv, dimensions.width);
+  createEffort(d3Data.effortData, effDiv, default_dimensions);
   // creates plot area
   const svg = d3
     .select(divId)
@@ -414,7 +289,7 @@ function updateStations(divId, data, variables, effort_data, bins, effDiv) {
   const dimension = plot_dimensions(container_dimensions(), margins());
 
   const newd3Data = functions.newCreateD3(data, variables, effort_data, bins);
-  updateEffort(newd3Data.effortData, effDiv, dimension.width);
+  updateEffort(newd3Data.effortData, effDiv, default_dimensions);
 
   const svg = d3.select(divId);
   svg
@@ -526,7 +401,7 @@ function updateStatic(divId, data, variables, effort_data, bins, effDiv) {
   const dimension = plot_dimensions(container_dimensions(), margins());
   const newd3Data = functions.newCreateD3(data, variables, effort_data, bins);
   console.time("effort")
-  updateEffort(newd3Data.effortData, effDiv, dimension.width);
+  updateEffort(newd3Data.effortData, effDiv, default_dimensions);
 console.timeEnd("effort")
   const svg = d3.select(divId);
 console.time("rest")
