@@ -125,19 +125,19 @@ const createEffort = (data, effDiv, width) => {
 
   // X axis
   var x = d3
-    .scaleBand()
-    .range([0, width])
+    .scaleLinear()
     .domain(
-      data.map(function (d) {
-        return d.group;
-      })
-    )
-    .padding(0.2);
-  svg
+      [0,365]
+          )  
+    .range([0, width])
+
+    svg
     .append("g")
     .attr("transform", "translate(0," + height + ")")
     .attr("class", "effortX")
-    .call(d3.axisBottom(x))
+    .call(d3.axisBottom(x)    .ticks(365 / 5)
+    )
+
     .selectAll("text")
     .attr("transform", "translate(-10,0)rotate(-45)")
     .style("text-anchor", "end");
@@ -169,7 +169,7 @@ const createEffort = (data, effDiv, width) => {
     .attr("y", function (d) {
       return y(d.value);
     })
-    .attr("width", x.bandwidth())
+    .attr("width", 5)
     .attr("height", function (d) {
       return height - y(d.value);
     })
@@ -187,14 +187,10 @@ const updateEffort = (data, effDiv, width) => {
 
   // X axis
   var x = d3
-    .scaleBand()
+    .scaleLinear()
     .range([0, width])
     .domain(
-      data.map(function (d) {
-        return d.group;
-      })
-    )
-    .padding(0.2);
+[0,365]    )
 
   let xaxis = svg.select("g.effortX");
   xaxis.transition().duration(1000).call(d3.axisBottom(x));
@@ -226,7 +222,7 @@ const updateEffort = (data, effDiv, width) => {
       return x(d.group);
     })
 
-    .attr("width", x.bandwidth())
+    .attr("width", (30))
     .attr("y", height)
     .transition()
     .duration(300)
