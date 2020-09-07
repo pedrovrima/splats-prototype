@@ -1,6 +1,10 @@
 import functions from "./index";
-import {createEffort,updateEffort} from "./effort_plot"
+import effortPlots from "./effort_plot"
+import splatsPlots from "./splats_plot"
 import {default_dimensions} from "./plot_parts"
+
+const {createEffort,updateEffort}=effortPlots
+const {createSplats} = splatsPlots
 
 const d3 = require("d3");
 
@@ -15,6 +19,7 @@ const plot_dimensions = (container_dimensions, margins) => {
   return {
     width: container_dimensions.width - margins.left - margins.right,
     height: container_dimensions.height - margins.bottom - margins.top,
+    margins
   };
 };
 
@@ -55,24 +60,6 @@ const yAxis = (data, height) =>
     .range([height, 0])
     .nice();
 
-const error_bar_func = (dimensions, data) =>
-  d3
-    .area()
-    .x(function (d, i) {
-      return xAxis(dimensions.width)(d.data.key);
-    })
-    .y1(function (d) {
-      return yAxis(
-        data,
-        dimensions.height
-      )(Math.max(functions.flatten(d.data.stack)) + +5);
-    })
-    .y0(function (d) {
-      return yAxis(
-        data,
-        dimensions.height
-      )(Math.max(functions.flatten(d.data.stack)) - +5);
-    });
 
 const createLegend = (svg, data, color, dimensions) => {
   const data_svg = svg.selectAll("mydots").data(data.groups);
@@ -119,139 +106,73 @@ function createPlot(divId, data, variables, effort_data, bins, effDiv) {
   const d3Data = functions.newCreateD3(data, variables, effort_data, bins);
 
   createEffort(d3Data.effortData, effDiv, default_dimensions);
-  // creates plot area
-  const svg = d3
-    .select(divId)
-    .append("svg")
-    .attr("width", container_dimensions().width)
-    .attr("height", container_dimensions().height)
+  createSplats(divId,d3Data,dimensions)
+  
 
-    .append("g")
-    .attr(
-      "transform",
-      "translate(" + margins().left + "," + margins().top + ")"
-    );
+  // const errorData = d3Data.stack[d3Data.stack.length - 1].map((stac, i) => [
+  //   { data: stac.data, value: stac[1], se: d3Data.ses[i] },
+  // ]);
 
-  svg
-    .append("rect")
-    .attr("width", container_dimensions().width)
-    .attr("height", container_dimensions().height)
-    .attr("fill", "white")
-    .attr(
-      "transform",
-      "translate(-" + margins().left + ",-" + margins().top + ")"
-    );
+  // var errorBars = svg.selectAll("path.errorBar").data(errorData);
+  // errorBars
+  //   .enter()
+  //   .append("path")
+  //   .attr("class", "errorBar")
+  //   .attr(
+  //     "d",
+  //     d3
+  //       .area()
+  //       .x(function (d, i) {
+  //         return xAxis(dimensions.width)(d.data.key);
+  //       })
+  //       .y0((d, i) => yAxis(d3Data, dimensions.height)(d.value - d.se))
+  //       .y1((d, i) => yAxis(d3Data, dimensions.height)(d.value + d.se))
+  //   )
 
-  svg
-    .append("g")
-    .attr("transform", "translate(0," + dimensions.height + ")")
-    .call(d3.axisBottom(xAxis(dimensions.width)).ticks(365 / 5));
+  //   .attr("stroke", "red")
+  //   .attr("stroke-width", 1.5);
 
-  //   hides ticks
-  const ticks = d3.selectAll(".tick text");
-  ticks.each(function (_, i) {
-    if (i % 2 !== 0) d3.select(this).remove();
-  });
+  // errorBars
+  //   .enter()
+  //   .append("path")
+  //   .attr("class", "errorBar")
+  //   .attr(
+  //     "d",
+  //     d3
+  //       .area()
+  //       .x0(function (d, i) {
+  //         return xAxis(dimensions.width)(d.data.key - 2);
+  //       })
+  //       .x1(function (d, i) {
+  //         return xAxis(dimensions.width)(+d.data.key + 2);
+  //       })
+  //       .y((d, i) => {
+  //         return yAxis(d3Data, dimensions.height)(+d.se + d.value);
+  //       })
+  //   )
+  //   .attr("stroke", "red")
+  //   .attr("stroke-width", 1.5);
 
-  //   creates y axis
-  svg
-    .append("g")
-    .attr("class", "yaxis")
-    .call(d3.axisLeft(yAxis(d3Data, dimensions.height)));
+  // errorBars
+  //   .enter()
+  //   .append("path")
+  //   .attr("class", "errorBar")
+  //   .attr(
+  //     "d",
+  //     d3
+  //       .area()
+  //       .x0(function (d, i) {
+  //         return xAxis(dimensions.width)(d.data.key - 2);
+  //       })
+  //       .x1(function (d, i) {
+  //         return xAxis(dimensions.width)(+d.data.key + 2);
+  //       })
+  //       .y((d, i) => yAxis(d3Data, dimensions.height)(d.value - d.se))
+  //   )
+  //   .attr("stroke", "red")
+  //   .attr("stroke-width", 1.5);
 
-  // color palette
-  const color = create_color(d3Data);
-
-  // add areas
-  svg
-    .selectAll("mylayers")
-    .data(d3Data.stack)
-    .enter()
-    .append("path")
-    .attr("class", "area")
-    .style("fill", function (d) {
-      const name = d3Data.groups[d.key];
-      return color(name);
-    })
-    .attr(
-      "d",
-      d3
-        .area()
-        .x(function (d, i) {
-          return xAxis(dimensions.width)(d.data.key);
-        })
-        .y0(function (d) {
-          return yAxis(d3Data, dimensions.height)(d[0]);
-        })
-        .y1(function (d) {
-          return yAxis(d3Data, dimensions.height)(d[1]);
-        })
-    );
-
-  const errorData = d3Data.stack[d3Data.stack.length - 1].map((stac, i) => [
-    { data: stac.data, value: stac[1], se: d3Data.ses[i] },
-  ]);
-
-  var errorBars = svg.selectAll("path.errorBar").data(errorData);
-  errorBars
-    .enter()
-    .append("path")
-    .attr("class", "errorBar")
-    .attr(
-      "d",
-      d3
-        .area()
-        .x(function (d, i) {
-          return xAxis(dimensions.width)(d.data.key);
-        })
-        .y0((d, i) => yAxis(d3Data, dimensions.height)(d.value - d.se))
-        .y1((d, i) => yAxis(d3Data, dimensions.height)(d.value + d.se))
-    )
-
-    .attr("stroke", "red")
-    .attr("stroke-width", 1.5);
-
-  errorBars
-    .enter()
-    .append("path")
-    .attr("class", "errorBar")
-    .attr(
-      "d",
-      d3
-        .area()
-        .x0(function (d, i) {
-          return xAxis(dimensions.width)(d.data.key - 2);
-        })
-        .x1(function (d, i) {
-          return xAxis(dimensions.width)(+d.data.key + 2);
-        })
-        .y((d, i) => {
-          return yAxis(d3Data, dimensions.height)(+d.se + d.value);
-        })
-    )
-    .attr("stroke", "red")
-    .attr("stroke-width", 1.5);
-
-  errorBars
-    .enter()
-    .append("path")
-    .attr("class", "errorBar")
-    .attr(
-      "d",
-      d3
-        .area()
-        .x0(function (d, i) {
-          return xAxis(dimensions.width)(d.data.key - 2);
-        })
-        .x1(function (d, i) {
-          return xAxis(dimensions.width)(+d.data.key + 2);
-        })
-        .y((d, i) => yAxis(d3Data, dimensions.height)(d.value - d.se))
-    )
-    .attr("stroke", "red")
-    .attr("stroke-width", 1.5);
-
-  createLegend(svg, d3Data, color, dimensions);
+  // createLegend(svg, d3Data, color, dimensions);
 }
 
 function updatePath(svg, d3data, dimension) {

@@ -97,6 +97,13 @@ const updateYAxis=(svg,axis)=>{
 
 }
 
+const tickHider = ()=>{
+    const ticks = d3.selectAll(".tick text");
+  ticks.each(function (_, i) {
+    if (i % 2 !== 0) d3.select(this).remove();
+  });
+}
+
 // create svg 
 
 const createSvg=(div,dimensions)=> d3
@@ -110,4 +117,4 @@ const createSvg=(div,dimensions)=> d3
 
 
 
-module.exports={Axis, default_dimensions,create_color,addAxis,updateYAxis, createSvg}
+module.exports={Axis, tickHider, default_dimensions,create_color,addAxis,updateYAxis, createSvg}
