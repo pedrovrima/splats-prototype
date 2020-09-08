@@ -12,6 +12,8 @@ const {
 
 const functions = require("./index").default;
 
+const { createError, updateError } = require("./error_bars");
+const {createLegend,  updateLegend} = require("./legend_plot")
 const addBackground = (svg, dimensions) => {
   svg
     .append("rect")
@@ -28,12 +30,18 @@ const addBackground = (svg, dimensions) => {
     );
 };
 
-const createArea = (svg,data,color,dimensions,axis)=>{
-    svg
-    .selectAll("mylayers")
-    .data(data.stack)
-    .enter()
-    .append("path")
+const selectAreaSvg = (svg, data) =>
+  svg.selectAll("mylayers").data(data.stack)
+
+const selectAreas = (svg,data) =>
+  svg.select("g").selectAll("path.area").data(data.stack)
+const removeAreas = (svg) => {
+  svg.exit().remove()
+}
+
+const addArea = (svg, data, color, axis) =>
+  svg
+  .enter().append("path")
     .attr("class", "area")
     .style("fill", function (d) {
       const name = data.groups[d.key];
@@ -44,6 +52,7 @@ const createArea = (svg,data,color,dimensions,axis)=>{
       d3
         .area()
         .x(function (d, i) {
+          console.log(d)
           return axis.x(d.data.key);
         })
         .y0(function (d) {
@@ -53,84 +62,38 @@ const createArea = (svg,data,color,dimensions,axis)=>{
           return axis.y(d[1]);
         })
     );
-    }
 
-
-    const verticalBar = (svg,axis)=>{
-        svg
-        .enter()
-        .append("path")
-        .attr("class", "errorBar")
-        .attr(
-          "d",
-          d3
-            .area()
-            .x(function (d, i) {
-              return axis.x(d.data.key);
-            })
-            .y0((d, i) => axis.y(d.value - d.se))
-            .y1((d, i) => axis.y(d.value + d.se)))
-        
-    
-        .attr("stroke", "red")
-        .attr("stroke-width", 1.5)
-    
-    }
-
-    const horizontalBar = (svg,axis,positive)=>{
-        const value = positive?1:-1
-        svg
-        .enter()
-        .append("path")
-        .attr("class", "errorBar")
-        .attr(
-          "d",
-          d3
-            .area()
-            .x0(function (d, i) {
-              return axis.x(d.data.key - 2);
-            })
-            .x1(function (d, i) {
-              return axis.x(+d.data.key + 2);
-            })
-            .y((d, i) => {
-              return axis.y(d.value + value*d.se);
-            })
-        )
-        .attr("stroke", "red")
-        .attr("stroke-width", 1.5);
-    
-    }
-
-
-    const createError = (svg,data,axis)=>{
-        const errorData = data.stack[data.stack.length - 1].map((stac, i) => [
-            { data: stac.data, value: stac[1], se: data.ses[i] },
-          ]);
-        
-
-
-          var errorBars = svg.selectAll("path.errorBar").data(errorData);
-          verticalBar(errorBars,axis)
-          horizontalBar(errorBars,axis,true)
-          horizontalBar(errorBars,axis,false)
-
-        
-    }
-
+const updateArea = async (svg, data,color,axis) => {
+  const pre_path = selectAreas(svg,data);
+ removeAreas(pre_path);
+  addArea(pre_path, data, color, axis);
+};
 
 const createSplats = (splatsDiv, data, dimensions) => {
-
   const yData = functions.flatten(data.stack);
+  const axis = Axis(dimensions, yData);
   const color = create_color(data.groups);
 
   var svg = createSvg(splatsDiv, dimensions);
   addBackground(svg, dimensions);
-  const axis = Axis(dimensions, yData);
   addAxis(svg, axis, dimensions.height);
   tickHider();
-  createArea(svg,data,color,dimensions,axis)
-  createError(svg,data,axis)
+  addArea(selectAreaSvg(svg, data), data, color, axis);
+  createError(svg, data, axis);
+  createLegend(svg, data, color, dimensions);
 };
 
-module.exports = { createSplats };
+const updateSplats = (splatsDiv, data, dimensions) => {
+  const yData = functions.flatten(data.stack);
+  const axis = Axis(dimensions, yData);
+  const color = create_color(data.groups);
+  var svg = d3.select(splatsDiv);
+
+  updateArea(svg,data,color,axis)
+  updateYAxis(svg, axis);
+  updateError(svg,data,axis)
+  updateLegend(svg, data, color, dimensions);
+
+};
+
+module.exports = { createSplats, updateSplats };
