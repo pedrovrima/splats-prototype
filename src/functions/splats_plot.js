@@ -13,7 +13,7 @@ const {
 const functions = require("./index").default;
 
 const { createError, updateError } = require("./error_bars");
-const {createLegend,  updateLegend} = require("./legend_plot")
+const { createLegend, updateLegend } = require("./legend_plot");
 const addBackground = (svg, dimensions) => {
   svg
     .append("rect")
@@ -30,43 +30,56 @@ const addBackground = (svg, dimensions) => {
     );
 };
 
-const selectAreaSvg = (svg, data) =>
-  svg.selectAll("mylayers").data(data.stack)
+const selectAreaSvg = (svg, data) => svg.selectAll("mylayers").data(data.stack);
 
-const selectAreas = (svg,data) =>
-  svg.select("g").selectAll("path.area").data(data.stack)
+const selectAreas = (svg, data) =>
+  svg.select("g").selectAll("path.area").data(data.stack);
 const removeAreas = (svg) => {
-  svg.exit().remove()
-}
+  svg.exit().remove();
+};
 
-const addArea = (svg, data, color, axis) =>
-  svg
-  .enter().append("path")
-    .attr("class", "area")
-    .style("fill", function (d) {
-      const name = data.groups[d.key];
-      return color(name);
-    })
-    .attr(
-      "d",
-      d3
-        .area()
-        .x(function (d, i) {
-          console.log(d)
-          return axis.x(d.data.key);
-        })
-        .y0(function (d) {
-          return axis.y(d[0]);
-        })
-        .y1(function (d) {
-          return axis.y(d[1]);
-        })
-    );
+const setStyle = (svg, data, color) =>
+  svg.style("fill", function (d) {
+    const name = data.groups[d.key];
+    return color(name);
+  });
 
-const updateArea = async (svg, data,color,axis) => {
-  const pre_path = selectAreas(svg,data);
- removeAreas(pre_path);
-  addArea(pre_path, data, color, axis);
+const addArea = (svg, axis) => {
+  svg.attr(
+    "d",
+    d3
+      .area()
+      .x(function (d, i) {
+        console.log(d);
+        return axis.x(d.data.key);
+      })
+      .y0(function (d) {
+        return axis.y(d[0]);
+      })
+      .y1(function (d) {
+        return axis.y(d[1]);
+      })
+  );
+};
+
+const createArea = (svg, data, color, axis) => {
+  const path = svg.enter().append("path").attr("class", "area");
+
+  setStyle(path, data, color);
+  addArea(path, axis);
+  addArea(path, axis);
+};
+
+const updateArea = async (svg, data, color, axis) => {
+  const paths = svg.select("g").selectAll("path.area").data(data.stack);
+  paths.exit().remove();
+
+  addArea(
+    setStyle(paths.enter().append("path").attr("class", "area"), data, color),
+    axis
+  );
+
+  addArea(paths, axis);
 };
 
 const createSplats = (splatsDiv, data, dimensions) => {
@@ -78,7 +91,7 @@ const createSplats = (splatsDiv, data, dimensions) => {
   addBackground(svg, dimensions);
   addAxis(svg, axis, dimensions.height);
   tickHider();
-  addArea(selectAreaSvg(svg, data), data, color, axis);
+  createArea(selectAreaSvg(svg, data), data, color, axis);
   createError(svg, data, axis);
   createLegend(svg, data, color, dimensions);
 };
@@ -89,11 +102,10 @@ const updateSplats = (splatsDiv, data, dimensions) => {
   const color = create_color(data.groups);
   var svg = d3.select(splatsDiv);
 
-  updateArea(svg,data,color,axis)
+  updateArea(svg, data, color, axis);
   updateYAxis(svg, axis);
-  updateError(svg,data,axis)
+  updateError(svg, data, axis);
   updateLegend(svg, data, color, dimensions);
-
 };
 
 module.exports = { createSplats, updateSplats };

@@ -17,7 +17,7 @@ function App() {
   
 
 
-  const stationUpdater = station =>      plot_functions.updateStations(
+  const stationUpdater = station =>      plot_functions.updateStatic(
     refs.current,
     capture_data,
     groupVariables.sort(),
