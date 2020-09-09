@@ -56,9 +56,6 @@ const Plots = (props) => {
 
   return (
     <>
-      <div 
-      style={{ position:"relative" }}
-      >
         <div ref={splatsRef} id="graph"/>
         <div
           ref={effortRef}
@@ -67,19 +64,6 @@ const Plots = (props) => {
         />
           {" "}
 
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            height: "100%",
-            width: "100%",
-            zIndex: 999,
-            backgroundColor: "blue",
-            opacity:.25
-          }}
-          className={`${loading?"":"hidden"}`}
-        ></div>
-      </div>
       <button
         className="btn-add-flex"
         onClick={() => setShowEffort(!showEffort)}

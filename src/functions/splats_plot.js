@@ -84,7 +84,7 @@ const createSplats = (splatsDiv, data, dimensions) => {
   var svg = createSvg(splatsDiv, dimensions);
   addBackground(svg, dimensions);
   addAxis(svg, axis, dimensions.height);
-  tickHider();
+  // tickHider();
   createArea(selectAreaSvg(svg, data), data, color, axis);
   createError(svg, data, axis);
   createLegend(svg, data, color, dimensions);

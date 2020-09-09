@@ -15,6 +15,23 @@
 
 
 
+.btn-top-add {
+    @apply bg-blue-600 text-white font-bold py-2 m-2 px-2 w-20 h-12 rounded-lg }
+
+
+    .btn-top-add-flex {
+        @apply bg-blue-600 text-white font-bold py-2 m-2 px-2 rounded-lg }
+    
+.btn-top-add:hover{
+    @apply shadow-inner bg-blue-400
+}
+
+
+
+
+
+
+
 .btn-remove {
     @apply bg-red-700 text-white font-bold py-2 m-2 px-4 rounded 
 }
@@ -25,6 +42,12 @@
 
 .btn-active{
     @apply  bg-white border-teal-600 border-4 border-solid text-teal-600 w-20 h-12
+}
+
+
+
+.btn-top-active{
+    @apply  bg-white border-blue-600 border-4 border-solid text-blue-600 w-20 h-12
 }
 
 

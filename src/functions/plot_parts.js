@@ -71,7 +71,7 @@ const addXAxis= (svg,x,height)=>{
     .append("g")
     .attr("transform", "translate(0," + height + ")")
     .attr("class", "xAxis")
-    .call(d3.axisBottom(x).ticks(365 / 5))
+    .call(d3.axisBottom(x).ticks(365 / 10))
       .selectAll("text")
     .attr("transform", "translate(-10,0)rotate(-45)")
     .style("text-anchor", "end");

@@ -46,10 +46,11 @@ const horizontalBar = (svg, axis, positive) => {
 };
 
 const createError = (svg, data, axis) => {
-  const errorData = data.stack[data.stack.length - 1].map((stac, i) => [
-    { data: stac.data, value: stac[1], se: data.ses[i] },
-  ]);
 
+  const errorData =  data.stack.length?data.stack[data.stack.length - 1].map((stac, i) => [
+    { data: stac.data, value: stac[1], se: data.ses[i] },
+  ]):[]
+  
   var errorBars = svg.selectAll("path.errorBar").data(errorData);
   ;
   verticalBar(errorBars, axis);

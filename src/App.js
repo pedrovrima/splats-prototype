@@ -3,27 +3,36 @@ import "./App.css";
 import effort_data from "./data/effort";
 import capture_data from "./data/capture";
 import functions from "./functions";
-import plot_functions from "./functions/graph_functions"
-import regions_data from "./data/regions"
-import {saveSvgAsPng} from "save-svg-as-png"
-import { saveAs } from 'file-saver';
-import saver from "./svg_download"
-import Plots from "./components/plots"
+import plot_functions from "./functions/graph_functions";
+import regions_data from "./data/regions";
+import { saveSvgAsPng } from "save-svg-as-png";
+import { saveAs } from "file-saver";
+import saver from "./svg_download";
+import Container from "./components/plot_container";
 import useDidMountEffect from "./functions/didMountHook";
 
+const d3 = require("d3");
 
-const d3 = require("d3")
-  
 function App() {
-
-
-  
-
-
-  let stations = [...new Set(effort_data.map(eff=>eff.station)) ].sort()
+  let stations = [...new Set(effort_data.map((eff) => eff.station))].sort();
   let [binSize, setBinSize] = useState(10);
   let [groupVariables, setGroupVariables] = useState(["AgeClass", "SexClass"]);
-  let [selectedStations, setSelectedStations] = useState(["PARK", "JACR", "HOME", "NAVR", "CABL","GATE","GELL","HOUS","KAHN","LEST","MOMA","SAC2","SACR","SHAY"]);
+  let [selectedStations, setSelectedStations] = useState([
+    "PARK",
+    "JACR",
+    "HOME",
+    "NAVR",
+    "CABL",
+    "GATE",
+    "GELL",
+    "HOUS",
+    "KAHN",
+    "LEST",
+    "MOMA",
+    "SAC2",
+    "SACR",
+    "SHAY",
+  ]);
   let [effortData, setEffortData] = useState(
     functions.filterStation(effort_data, selectedStations)
   );
@@ -35,21 +44,21 @@ function App() {
     setEffortData(functions.filterStation(effort_data, selectedStations));
   }, [selectedStations]);
 
-  
   let refs = useRef(null);
   let effrefs = useRef(null);
 
-  let buttonRef=useRef(null)
+  let buttonRef = useRef(null);
   const updateBinSize = (bin) => {
     setBinSize(bin);
   };
 
   useEffect(() => {
-    setCaptureData(functions.filterCaptures(capture_data, functions.getEffortIds(effortData)))
-   }, [effortData]);
-  
+    setCaptureData(
+      functions.filterCaptures(capture_data, functions.getEffortIds(effortData))
+    );
+  }, [effortData]);
 
-  const checker = (arr, target) => target.every(v => arr.includes(v));
+  const checker = (arr, target) => target.every((v) => arr.includes(v));
 
   const stationChecker = (stations, station_name) => {
     stations.indexOf(station_name) < 0
@@ -63,27 +72,20 @@ function App() {
       : setGroupVariables(selectedVars.filter((stat) => stat !== variable));
   };
 
+  const regionChecker = (stations, regions) => {
+    !checker(stations, regions)
+      ? setSelectedStations([...new Set([...stations, ...regions])])
+      : setSelectedStations(stations.filter((stat) => !regions.includes(stat)));
+  };
 
+  const click = function () {
+    const svg = d3.select("svg");
 
-  const regionChecker = (stations, regions)=>{
-    !checker(stations,regions)? 
-    setSelectedStations([...new Set([...stations, ...regions])]):
-    setSelectedStations(stations.filter((stat) => !regions.includes(stat)))
-  
-  }
-  
- 
-
-const click= function(){
-  const svg = d3
-  .select("svg")
-  
-  
     var svgString = saver.getSVGString(svg.node());
-    saver.svgString2Image( svgString, 2*1000, 2*400, 'png', save ); // passes Blob and filesize String to the callback
-  
-    function save( dataBlob, filesize ){
-      saveAs( dataBlob, 'D3 vis exported to PNG.png' ); // FileSaver.js function
+    saver.svgString2Image(svgString, 2 * 1000, 2 * 400, "png", save); // passes Blob and filesize String to the callback
+
+    function save(dataBlob, filesize) {
+      saveAs(dataBlob, "D3 vis exported to PNG.png"); // FileSaver.js function
     }
   };
 
@@ -91,77 +93,47 @@ const click= function(){
     <div>
       <div>
         <h1>SWTH</h1>
-        <h2
-          style={{ margin: "10px" }}
-        >{`${selectedStations} bin size=${binSize}`}</h2>
-<Plots  capture_data={captureData} effortData={effortData} binSize={binSize} groupVariables={groupVariables}></Plots>
-
-        <button type="button" className={"btn-add-flex"} onClick={()=>click()}>Download</button>
-        <h3>Bin size (days)</h3>
-        <button className={`btn-add ${binSize===5?"btn-active":""}`} type="button" onClick={() => updateBinSize(5)}>
-          {" "}
-          5
-        </button>
-        <button className={`btn-add ${binSize===10?"btn-active":""}`} type="button" onClick={() => updateBinSize(10)}>
-          {" "}
-          10
-        </button>
-        <button className={`btn-add ${binSize===15?"btn-active":""}`} type="button" onClick={() => updateBinSize(15)}>
-          {" "}
-          15
-        </button>
-        <button className={`btn-add ${binSize===30?"btn-active":""}`} type="button" onClick={() => updateBinSize(30)}>
-          {" "}
-          30
-        </button>
-        <button className={`btn-add ${binSize===45?"btn-active":""}`} type="button" onClick={() => updateBinSize(45)}>
-          {" "}
-          45
-        </button>
-        <button className={`btn-add ${binSize===60?"btn-active":""}`} type="button" onClick={() => updateBinSize(60)}>
-          {" "}
-          60
-        </button>
-      </div>
-      <h3>Bird Classes</h3>
+        <h3>Bird Classes</h3>
       <div>
-
-        <button className={`btn-add ${checker(groupVariables,["AgeClass"])?"btn-active":""}`} type="button" onClick={() => variableChecker(groupVariables,"AgeClass")}>
+        <button
+          className={`btn-add ${
+            checker(groupVariables, ["AgeClass"]) ? "btn-active" : ""
+          }`}
+          type="button"
+          onClick={() => variableChecker(groupVariables, "AgeClass")}
+        >
           Age
         </button>
 
-        <button className={`btn-add ${checker(groupVariables,["SexClass"])?"btn-active":""}`} type="button" onClick={() => variableChecker(groupVariables,"SexClass")}>
+        <button
+          className={`btn-add ${
+            checker(groupVariables, ["SexClass"]) ? "btn-active" : ""
+          }`}
+          type="button"
+          onClick={() => variableChecker(groupVariables, "SexClass")}
+        >
           Sex
         </button>
-
-       
       </div>
-      <h3>Regions</h3> <button className="btn-remove" type="button" onClick={()=>setSelectedStations([])}>remove all</button>
-      <div>
-        {regions_data.map(region=>{
-          return(
-            <button className={`btn-add ${checker(selectedStations,region.stations)?"btn-active":""}`} type="button" onClick={() => regionChecker(selectedStations, region.stations)}>
-            {region.region}
-          </button>
+        {regions_data.map((reg) => (
+          <Container
+            this_region_data={reg}
+            effort_data={effort_data}
+            capture_data={capture_data}
+            binSize={binSize}
+            groupVariables={groupVariables}
+          ></Container>
+        ))}
+        <button
+          type="button"
+          className={"btn-add-flex"}
+          onClick={() => click()}
+        >
+          Download
+        </button>
+
+      </div>
   
-          )
-        })}
-
-      </div>
-
-
-      <h3>Stations</h3> <button className="btn-remove" type="button" onClick={()=>setSelectedStations([])}>remove all</button>
-      <div>
-        {stations.map(stat=>{
-          return(
-            <button className={`btn-add ${checker(selectedStations,[stat])?"btn-active":""}`} type="button" onClick={() => stationChecker(selectedStations, stat)}>
-            {stat}
-          </button>
-  
-          )
-        })}
-
-      </div>
     </div>
   );
 }
