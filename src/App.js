@@ -4,11 +4,14 @@ import effort_data from "./data/effort";
 import capture_data from "./data/capture";
 import functions from "./functions";
 import plot_functions from "./functions/graph_functions"
-import useDidMountEffect from "./didMountHook";
 import regions_data from "./data/regions"
 import {saveSvgAsPng} from "save-svg-as-png"
 import { saveAs } from 'file-saver';
 import saver from "./svg_download"
+import Plots from "./components/plots"
+import useDidMountEffect from "./functions/didMountHook";
+
+
 const d3 = require("d3")
   
 function App() {
@@ -17,15 +20,7 @@ function App() {
   
 
 
-  const stationUpdater = station =>      plot_functions.updateStatic(
-    refs.current,
-    capture_data,
-    groupVariables.sort(),
-    station,
-    createBins(365, binSize),effrefs.current)
-
   let stations = [...new Set(effort_data.map(eff=>eff.station)) ].sort()
-  console.log(stations)
   let [binSize, setBinSize] = useState(10);
   let [groupVariables, setGroupVariables] = useState(["AgeClass", "SexClass"]);
   let [selectedStations, setSelectedStations] = useState(["PARK", "JACR", "HOME", "NAVR", "CABL","GATE","GELL","HOUS","KAHN","LEST","MOMA","SAC2","SACR","SHAY"]);
@@ -36,6 +31,10 @@ function App() {
     functions.filterCaptures(capture_data, functions.getEffortIds(effortData))
   );
 
+  useDidMountEffect(() => {
+    setEffortData(functions.filterStation(effort_data, selectedStations));
+  }, [selectedStations]);
+
   
   let refs = useRef(null);
   let effrefs = useRef(null);
@@ -45,6 +44,10 @@ function App() {
     setBinSize(bin);
   };
 
+  useEffect(() => {
+    setCaptureData(functions.filterCaptures(capture_data, functions.getEffortIds(effortData)))
+   }, [effortData]);
+  
 
   const checker = (arr, target) => target.every(v => arr.includes(v));
 
@@ -68,60 +71,13 @@ function App() {
     setSelectedStations(stations.filter((stat) => !regions.includes(stat)))
   
   }
-
-  const createBins = (max, size) => {
-    let number_of_bins = Math.ceil(max / size);
-    let bins = [];
-    for (let i = 0; i < number_of_bins; i++) {
-      bins.push(5 + i * size);
-    }
-    return bins;
-  };
-
-  useDidMountEffect(() => {
-    setEffortData(functions.filterStation(effort_data, selectedStations));
-  }, [selectedStations]);
-
-
-  useDidMountEffect(() => {
-    plot_functions.updateStatic(
-      refs.current,
-      capture_data,
-      groupVariables.sort(),
-      effortData,
-      createBins(365, binSize),
-      effrefs.current
-    );
-  }, [binSize,groupVariables]);
-
-
-  useEffect(() => {
-   stationUpdater(effortData)
-  }, [effortData]);
-
-
-
-
-  useEffect(() => {
-    if (refs.current) {
-      plot_functions.createPlot(
-        refs.current,
-        captureData,
-        groupVariables,
-
-        effortData,
-        createBins(365, binSize),
-        effrefs.current
-      );
-    }
-  }, []);
   
  
 
 const click= function(){
   const svg = d3
   .select("svg")
-  console.log(svg)
+  
   
     var svgString = saver.getSVGString(svg.node());
     saver.svgString2Image( svgString, 2*1000, 2*400, 'png', save ); // passes Blob and filesize String to the callback
@@ -138,8 +94,7 @@ const click= function(){
         <h2
           style={{ margin: "10px" }}
         >{`${selectedStations} bin size=${binSize}`}</h2>
-        <div ref={refs} id="graph"> </div>
-        <div ref={effrefs} id="graph"> </div>
+<Plots  capture_data={captureData} effortData={effortData} binSize={binSize} groupVariables={groupVariables}></Plots>
 
         <button type="button" className={"btn-add-flex"} onClick={()=>click()}>Download</button>
         <h3>Bin size (days)</h3>

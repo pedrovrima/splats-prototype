@@ -156,6 +156,9 @@ function getStandardError(array) {
   }
 }
 
+
+
+
 function getBBNHValues(group_data) {
   return group_data.map((datum) => datum.birdnhour);
 }

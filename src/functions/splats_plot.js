@@ -2,7 +2,6 @@ const d3 = require("d3");
 
 const {
   Axis,
-  default_dimensions,
   addAxis,
   createSvg,
   updateYAxis,
@@ -32,11 +31,6 @@ const addBackground = (svg, dimensions) => {
 
 const selectAreaSvg = (svg, data) => svg.selectAll("mylayers").data(data.stack);
 
-const selectAreas = (svg, data) =>
-  svg.select("g").selectAll("path.area").data(data.stack);
-const removeAreas = (svg) => {
-  svg.exit().remove();
-};
 
 const setStyle = (svg, data, color) =>
   svg.style("fill", function (d) {
@@ -50,7 +44,7 @@ const addArea = (svg, axis) => {
     d3
       .area()
       .x(function (d, i) {
-        console.log(d);
+        ;
         return axis.x(d.data.key);
       })
       .y0(function (d) {

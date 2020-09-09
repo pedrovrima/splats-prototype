@@ -70,7 +70,7 @@ function getSVGString(svgNode) {
 }
 
 function svgString2Image(svgString, width, height, format, callback) {
-  console.log(svgString);
+  ;
   var format = format ? format : "png";
 
   var imgsrc =
@@ -90,13 +90,13 @@ function svgString2Image(svgString, width, height, format, callback) {
 
     canvas.toBlob(function (blob) {
       var filesize = Math.round(blob.length / 1024) + " KB";
-      console.log(blob);
+      ;
       if (callback) callback(blob, filesize);
     });
   };
 
   image.src = imgsrc;
-  console.log(image)
+  
   if (image.src) {
     // image.onload();
   }

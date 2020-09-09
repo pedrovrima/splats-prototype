@@ -21,9 +21,12 @@ const plot_dimensions = (container_dimensions, margins) => {
   };
 };
 
-function createPlot(divId, data, variables, effort_data, bins, effDiv) {
+function createPlot(divId, data, variables, effort_data, binSize, effDiv) {
   const c_dimension = container_dimensions();
   const dimensions = plot_dimensions(c_dimension, margins());
+  const bins =         functions.createBins(365, binSize)
+  
+
 
   const d3Data = functions.newCreateD3(data, variables, effort_data, bins);
 
@@ -31,11 +34,16 @@ function createPlot(divId, data, variables, effort_data, bins, effDiv) {
   createSplats(divId, d3Data, dimensions);
 }
 
-function updateStatic(divId, data, variables, effort_data, bins, effDiv) {
-  const newd3Data = functions.newCreateD3(data, variables, effort_data, bins);
-  updateEffort(newd3Data.effortData, effDiv, default_dimensions);
+const updateStatic= async(divId, data, variables, effort_data, binSize, effDiv)=> {
+  const bins =         functions.createBins(365, binSize)
 
-  updateSplats(divId, newd3Data, default_dimensions);
+   const newd3Data = await Promise.all([functions.newCreateD3(data, variables, effort_data, bins)]);
+  
+   
+  updateEffort(newd3Data[0].effortData, effDiv, default_dimensions);
+
+  updateSplats(divId, newd3Data[0], default_dimensions);
+  return("")
 }
 
 export default { createPlot, updateStatic };

@@ -51,16 +51,16 @@ const createError = (svg, data, axis) => {
   ]);
 
   var errorBars = svg.selectAll("path.errorBar").data(errorData);
-  console.log(errorBars);
+  ;
   verticalBar(errorBars, axis);
   horizontalBar(errorBars, axis, true);
   horizontalBar(errorBars, axis, false);
 };
 
 const updateError = (svg, data, axis) => {
-  const errorData = data.stack[data.stack.length - 1].map((stac, i) => [
+  const errorData =  data.stack.length?data.stack[data.stack.length - 1].map((stac, i) => [
     { data: stac.data, value: stac[1], se: data.ses[i] },
-  ]);
+  ]):[]
 
   const errorBars = svg.select("g").selectAll("path.errorBar").data([]);
   errorBars.exit().remove();
