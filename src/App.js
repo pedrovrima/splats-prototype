@@ -94,27 +94,27 @@ function App() {
       <div>
         <h1>SWTH</h1>
         <h3>Bird Classes</h3>
-      <div>
-        <button
-          className={`btn-add ${
-            checker(groupVariables, ["AgeClass"]) ? "btn-active" : ""
-          }`}
-          type="button"
-          onClick={() => variableChecker(groupVariables, "AgeClass")}
-        >
-          Age
-        </button>
+        <div>
+          <button
+            className={`btn-add ${
+              checker(groupVariables, ["AgeClass"]) ? "btn-active" : ""
+            }`}
+            type="button"
+            onClick={() => variableChecker(groupVariables, "AgeClass")}
+          >
+            Age
+          </button>
 
-        <button
-          className={`btn-add ${
-            checker(groupVariables, ["SexClass"]) ? "btn-active" : ""
-          }`}
-          type="button"
-          onClick={() => variableChecker(groupVariables, "SexClass")}
-        >
-          Sex
-        </button>
-      </div>
+          <button
+            className={`btn-add ${
+              checker(groupVariables, ["SexClass"]) ? "btn-active" : ""
+            }`}
+            type="button"
+            onClick={() => variableChecker(groupVariables, "SexClass")}
+          >
+            Sex
+          </button>
+        </div>
         {regions_data.map((reg) => (
           <Container
             this_region_data={reg}
@@ -131,9 +131,7 @@ function App() {
         >
           Download
         </button>
-
       </div>
-  
     </div>
   );
 }

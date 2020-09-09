@@ -1,8 +1,14 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 const PlotButtons = (props) => {
-  let {updateBinSize,binSize,stations,selectedStations,setSelectedStations} = props  
-  let[activeMenu,setActiveMenu] = useState("") 
+  let {
+    updateBinSize,
+    binSize,
+    stations,
+    selectedStations,
+    setSelectedStations,
+  } = props;
+  let [activeMenu, setActiveMenu] = useState("");
 
   const checker = (arr, target) => target.every((v) => arr.includes(v));
 
@@ -12,22 +18,39 @@ const PlotButtons = (props) => {
       : setSelectedStations(stations.filter((stat) => stat !== station_name));
   };
 
-
-
   return (
     <>
       <div className="grid grid-cols-2">
         <div className="col-span-1 flex justify-center">
-          <button className={` ${activeMenu==="stations"?"btn-top-active":""} btn-top-add`} onClick={()=>setActiveMenu("stations")}>Stations </button>
+          <button
+            className={` ${
+              activeMenu === "stations" ? "btn-top-active" : ""
+            } btn-top-add`}
+            onClick={() => setActiveMenu("stations")}
+          >
+            Stations{" "}
+          </button>
         </div>
 
         <div className="col-span-1 flex justify-center">
-          <button className={`${activeMenu==="bins"?"btn-top-active":""} btn-top-add`} onClick={()=>setActiveMenu("bins")}>Bins </button>
+          <button
+            className={`${
+              activeMenu === "bins" ? "btn-top-active" : ""
+            } btn-top-add`}
+            onClick={() => setActiveMenu("bins")}
+          >
+            Bins{" "}
+          </button>
         </div>
-        </div>
-        <div>
-        <div className={`m-2 p-6 w-full  ${activeMenu==="stations"?"":"hidden"}`}>
-    {stations.map(stat=>            <button
+      </div>
+      <div>
+        <div
+          className={`m-2 p-6 w-full  ${
+            activeMenu === "stations" ? "" : "hidden"
+          }`}
+        >
+          {stations.map((stat) => (
+            <button
               className={`btn-add ${
                 checker(selectedStations, [stat]) ? "btn-active" : ""
               }`}
@@ -36,65 +59,64 @@ const PlotButtons = (props) => {
             >
               {stat}
             </button>
-)}
-          </div>
-
-
-
-          <div className={`m-2 p-6 flex justify-between ${activeMenu==="bins"?"":"hidden"}`}>
-          <button
-          className={`btn-add ${binSize === 5 ? "btn-active" : ""}`}
-          type="button"
-          onClick={() => updateBinSize(5)}
-        >
-          {" "}
-          5
-        </button>
-        <button
-          className={`btn-add ${binSize === 10 ? "btn-active" : ""}`}
-          type="button"
-          onClick={() => updateBinSize(10)}
-        >
-          {" "}
-          10
-        </button>
-        <button
-          className={`btn-add ${binSize === 15 ? "btn-active" : ""}`}
-          type="button"
-          onClick={() => updateBinSize(15)}
-        >
-          {" "}
-          15
-        </button>
-        <button
-          className={`btn-add ${binSize === 30 ? "btn-active" : ""}`}
-          type="button"
-          onClick={() => updateBinSize(30)}
-        >
-          {" "}
-          30
-        </button>
-        <button
-          className={`btn-add ${binSize === 45 ? "btn-active" : ""}`}
-          type="button"
-          onClick={() => updateBinSize(45)}
-        >
-          {" "}
-          45
-        </button>
-        <button
-          className={`btn-add ${binSize === 60 ? "btn-active" : ""}`}
-          type="button"
-          onClick={() => updateBinSize(60)}
-        >
-          {" "}
-          60
-        </button>
-
-          </div>
-
-
+          ))}
         </div>
+
+        <div
+          className={`m-2 p-6 flex justify-between ${
+            activeMenu === "bins" ? "" : "hidden"
+          }`}
+        >
+          <button
+            className={`btn-add ${binSize === 5 ? "btn-active" : ""}`}
+            type="button"
+            onClick={() => updateBinSize(5)}
+          >
+            {" "}
+            5
+          </button>
+          <button
+            className={`btn-add ${binSize === 10 ? "btn-active" : ""}`}
+            type="button"
+            onClick={() => updateBinSize(10)}
+          >
+            {" "}
+            10
+          </button>
+          <button
+            className={`btn-add ${binSize === 15 ? "btn-active" : ""}`}
+            type="button"
+            onClick={() => updateBinSize(15)}
+          >
+            {" "}
+            15
+          </button>
+          <button
+            className={`btn-add ${binSize === 30 ? "btn-active" : ""}`}
+            type="button"
+            onClick={() => updateBinSize(30)}
+          >
+            {" "}
+            30
+          </button>
+          <button
+            className={`btn-add ${binSize === 45 ? "btn-active" : ""}`}
+            type="button"
+            onClick={() => updateBinSize(45)}
+          >
+            {" "}
+            45
+          </button>
+          <button
+            className={`btn-add ${binSize === 60 ? "btn-active" : ""}`}
+            type="button"
+            onClick={() => updateBinSize(60)}
+          >
+            {" "}
+            60
+          </button>
+        </div>
+      </div>
     </>
   );
 };
