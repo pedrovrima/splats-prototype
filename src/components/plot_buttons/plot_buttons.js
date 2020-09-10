@@ -62,6 +62,7 @@ const PlotButtons = (props) => {
         >
           {stations.map((stat) => (
             <button
+            key={stat}
               className={`btn-add ${
                 checker(selectedStations, [stat]) ? "btn-active" : ""
               }`}

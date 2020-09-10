@@ -10,61 +10,26 @@ import { saveAs } from "file-saver";
 import saver from "./svg_download";
 import Container from "./components/plot_container";
 import useDidMountEffect from "./functions/didMountHook";
+import yHook from "./functions/maxYHook";
 
 const d3 = require("d3");
 
 function App() {
-  let stations = [...new Set(effort_data.map((eff) => eff.station))].sort();
-  let [binSize, setBinSize] = useState(10);
+  const [yMax, setObjMax] = yHook();
+
+  const [yMaxes,setYMaxes] = useState({})
+  const [iCalc,setICalc]=useState(0)
+
+  const setObjY = (yMaxes,key,val)=>    {
+    console.log(yMaxes,key)
+    setYMaxes({...yMaxes,[key]:val})}
+
+useEffect(()=>setObjMax(yMaxes),[yMaxes])
+  
+
   let [groupVariables, setGroupVariables] = useState(["AgeClass", "SexClass"]);
-  let [selectedStations, setSelectedStations] = useState([
-    "PARK",
-    "JACR",
-    "HOME",
-    "NAVR",
-    "CABL",
-    "GATE",
-    "GELL",
-    "HOUS",
-    "KAHN",
-    "LEST",
-    "MOMA",
-    "SAC2",
-    "SACR",
-    "SHAY",
-  ]);
-  let [effortData, setEffortData] = useState(
-    functions.filterStation(effort_data, selectedStations)
-  );
-  let [captureData, setCaptureData] = useState(
-    functions.filterCaptures(capture_data, functions.getEffortIds(effortData))
-  );
-
-  useDidMountEffect(() => {
-    setEffortData(functions.filterStation(effort_data, selectedStations));
-  }, [selectedStations]);
-
-  let refs = useRef(null);
-  let effrefs = useRef(null);
-
-  let buttonRef = useRef(null);
-  const updateBinSize = (bin) => {
-    setBinSize(bin);
-  };
-
-  useEffect(() => {
-    setCaptureData(
-      functions.filterCaptures(capture_data, functions.getEffortIds(effortData))
-    );
-  }, [effortData]);
 
   const checker = (arr, target) => target.every((v) => arr.includes(v));
-
-  const stationChecker = (stations, station_name) => {
-    stations.indexOf(station_name) < 0
-      ? setSelectedStations([...stations, station_name])
-      : setSelectedStations(stations.filter((stat) => stat !== station_name));
-  };
 
   const variableChecker = (selectedVars, variable) => {
     selectedVars.indexOf(variable) < 0
@@ -72,12 +37,7 @@ function App() {
       : setGroupVariables(selectedVars.filter((stat) => stat !== variable));
   };
 
-  const regionChecker = (stations, regions) => {
-    !checker(stations, regions)
-      ? setSelectedStations([...new Set([...stations, ...regions])])
-      : setSelectedStations(stations.filter((stat) => !regions.includes(stat)));
-  };
-
+  useEffect(() => console.log("here", yMaxes,yMax), [yMax]);
   const click = function () {
     const svg = d3.select("svg");
 
@@ -91,6 +51,9 @@ function App() {
 
   return (
     <div>
+      <button className="btn-add" onClick={() => alert(yMax)}>
+        yMax
+      </button>
       <div>
         <h1>SWTH</h1>
         <h3>Bird Classes</h3>
@@ -115,15 +78,28 @@ function App() {
             Sex
           </button>
         </div>
-        {regions_data.map((reg) => (
-          <Container
-            this_region_data={reg}
-            effort_data={effort_data}
-            capture_data={capture_data}
-            binSize={binSize}
-            groupVariables={groupVariables}
-          ></Container>
-        ))}
+        {regions_data.map((reg, i) => {
+          if (reg.region !== "DUNE") {
+            return (
+              <Container
+                key={reg.region}
+                this_region_data={reg}
+                effort_data={effort_data}
+                capture_data={capture_data}
+                groupVariables={groupVariables}
+                maxYHook={{yMaxes,setObjY}}
+                yMaxes={yMaxes}
+                i={i}
+                yMax={yMax}
+                iCalc={iCalc}
+                setICalc={setICalc}
+                total={regions_data.length-1}
+              ></Container>
+            );
+          }else{
+            return
+          }
+        })}
         <button
           type="button"
           className={"btn-add-flex"}

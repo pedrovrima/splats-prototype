@@ -3,58 +3,53 @@ import useDidMountEffect from "../../functions/didMountHook";
 import plot_functions from "../../functions/graph_functions";
 
 const Plots = (props) => {
-  console.log(props);
-  let { capture_data, effortData, binSize, groupVariables } = props;
+  let { plotData, yMax,drawPlot } = props;
 
   const splatsRef = useRef(null);
   const effortRef = useRef(null);
 
-  console.log(splatsRef)
   const [showEffort, setShowEffort] = useState(false);
 
-  const asyncSetPlot = async()=>{
-  await Promise.all([plot_functions.updateStatic(
-      splatsRef.current,
-      capture_data,
-      groupVariables.sort(),
-      effortData,
-      binSize,
-      effortRef.current
-    )])
-
-  }
+  const asyncSetPlot = async () => {
+    await Promise.all([
+      plot_functions.updateStatic(
+        splatsRef.current,
+        plotData,
+        effortRef.current,
+        yMax
+      ),
+    ]);
+  };
 
   useDidMountEffect(() => {
-    asyncSetPlot()
-  }, [binSize, groupVariables, capture_data]);
+    if(drawPlot){
+    asyncSetPlot()};
+  }, [plotData,yMax]);
 
   useEffect(() => {
-    if (splatsRef.current) {
+    if (splatsRef.current && drawPlot) {
       plot_functions.createPlot(
         splatsRef.current,
-        capture_data,
-        groupVariables,
-
-        effortData,
-        binSize,
-        effortRef.current
+        plotData,
+        effortRef.current,
+        yMax
       );
     }
   }, []);
 
   return (
     <>
-        <div ref={splatsRef} id="graph"/>
-        <div
-          ref={effortRef}
-          className={`${showEffort ? "" : "hidden"}`}
-          id="graph"
-        />
-          {" "}
-
+      <div ref={splatsRef} id="graph" />
+      <div
+        ref={effortRef}
+        className={`${showEffort ? "" : "hidden"}`}
+        id="graph"
+      />{" "}
       <button
         className="btn-add-flex"
-        onClick={() => {setShowEffort(!showEffort)}}
+        onClick={() => {
+          setShowEffort(!showEffort);
+        }}
       >
         {showEffort ? "Hide" : "Show"} effort
       </button>

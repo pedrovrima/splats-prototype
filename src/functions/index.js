@@ -288,15 +288,14 @@ function newNHcalculator(group_data, data) {
 
 
 
-function newCreateD3(full_data, variables, effort_data, bins) {
+function newCreateD3(full_data, variables, effort_data, binSize) {
   
+  const bins =   createBins(365, binSize)
 
   let data_with_group = full_data.map((datum) => dataGroupper(datum, variables));
   let groups = getGroups(data_with_group, "group").sort();
-  console.time("part2");
   let filtered_data=filterCaptures(data_with_group, getEffortIds(effort_data))
   let nethour_data = groupNetHourFlatter2(filtered_data, effort_data);
-  console.timeEnd("part2");
 
 
   let binned_data = nethour_data.map((datum) => binner(datum, bins));
@@ -329,10 +328,8 @@ function newCreateD3(full_data, variables, effort_data, bins) {
     return {data:groupMean,nh:datum.total_nh,bin:datum.bin};
   });
 
-  console.time("new")
   let justData= binData.map(datum=>datum.data)
   let effortData = binData.map(datum=> {return {value:datum.nh,group:datum.bin}})
-  console.timeEnd("new")
   
   let ses = binData.map(datum=>{
   
@@ -342,7 +339,10 @@ function newCreateD3(full_data, variables, effort_data, bins) {
   let nested_data = binNestter(flatten(justData));
 
   let stacked_data = stackerD3(nested_data, groups);
+ 
+  const flatStack=flatten(flatten(stacked_data))
   return {
+    yMax:Math.max(...flatStack),
     ses,
     stack: stacked_data,
     groups: groups,

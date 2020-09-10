@@ -26,7 +26,6 @@ const container_dimensions = (width = 1000, height = 400) => {
 
   const default_dimensions = plot_dimensions(container_dimensions(),margins())
   
-  console.log(default_dimensions)
 // Colors
 
 
@@ -43,23 +42,32 @@ const create_color = (groups) => {
 
 //   Axis
 
+const maxFunction = (data)=>
+  d3.max(data, function (d) {
+    return +d;
+  }) * 1.2
+
+
 
 const xAxis = (width) => d3.scaleLinear().domain([0, 365]).range([0, width]);
-const yAxis = (y_data, height) =>
-  d3
+const yAxis = (y_data, height, yHook) =>{
+  // console.log(yHook,y_data,came)
+  // if(yHook){
+  //   yHook.checkYMax(maxFunction(y_data))
+  // }
+  const maximum = yHook?yHook*1.2:maxFunction(y_data)
+  return d3
     .scaleLinear()
     .domain([
-      0,
-      d3.max(y_data, function (d) {
-        return +d;
-      }) * 1.2,
+      0,maximum
+
     ])
     .range([height, 0])
     .nice();
+  }
 
-
-const Axis=(dimensions,y_data)=>{
-    return{y:yAxis(y_data,dimensions.height),x:xAxis(dimensions.width)
+const Axis=(dimensions,y_data,max_y)=>{
+    return{y:yAxis(y_data,dimensions.height,max_y),x:xAxis(dimensions.width)
     }
 }    
 

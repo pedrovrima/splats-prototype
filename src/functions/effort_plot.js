@@ -71,7 +71,7 @@ const createEffort = (data, effDiv, dimensions) => {
   var svg = createSvg(effDiv, new_dimensions);
 
   // Create axis
-  const axis = Axis(new_dimensions, allNh);
+  const axis = Axis(new_dimensions, allNh,0,"effort");
 
   // X axis
   addAxis(svg, axis, height);
@@ -91,7 +91,7 @@ const updateEffort = (data, effDiv, dimensions) => {
 
   // deal with axis
 
-  var axis = Axis(new_dimensions, allNh);
+  var axis = Axis(new_dimensions, allNh,0,"effort");
 
   updateYAxis(svg, axis);
 

@@ -388,7 +388,6 @@ function updatePath(svg, d3data, dimension) {
     .attr("class", "area")
     .style("fill", function (d) {
       const name = d3data.groups[d.key];
-      console.log(create_color(d3data));
       return create_color(d3data)(name);
     })
     .attr(

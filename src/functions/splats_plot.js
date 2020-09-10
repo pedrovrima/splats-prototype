@@ -76,9 +76,10 @@ const updateArea = async (svg, data, color, axis) => {
   addArea(paths, axis);
 };
 
-const createSplats = (splatsDiv, data, dimensions) => {
+const createSplats = (splatsDiv, data, dimensions,yHook) => {
+  console.log(yHook)
   const yData = functions.flatten(data.stack);
-  const axis = Axis(dimensions, yData);
+  const axis = Axis(dimensions, yData,yHook);
   const color = create_color(data.groups);
 
   var svg = createSvg(splatsDiv, dimensions);
@@ -90,9 +91,9 @@ const createSplats = (splatsDiv, data, dimensions) => {
   createLegend(svg, data, color, dimensions);
 };
 
-const updateSplats = (splatsDiv, data, dimensions) => {
+const updateSplats = (splatsDiv, data, dimensions,yHook) => {
   const yData = functions.flatten(data.stack);
-  const axis = Axis(dimensions, yData);
+  const axis = Axis(dimensions, yData,yHook);
   const color = create_color(data.groups);
   var svg = d3.select(splatsDiv);
 
