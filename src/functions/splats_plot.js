@@ -102,4 +102,4 @@ const updateSplats = (splatsDiv, data, dimensions) => {
   updateLegend(svg, data, color, dimensions);
 };
 
-module.exports = { createSplats, updateSplats };
+export default  { createSplats, updateSplats };

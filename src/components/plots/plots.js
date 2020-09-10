@@ -9,18 +9,10 @@ const Plots = (props) => {
   const splatsRef = useRef(null);
   const effortRef = useRef(null);
 
+  console.log(splatsRef)
   const [showEffort, setShowEffort] = useState(false);
-  let [loading,setLoading]=useState(false)
-
-  const setLoadingIntercept = (state)=>{
-    console.log("setting",state)
-    
-    setLoading(state)
-    console.log(loading)
-  }
 
   const asyncSetPlot = async()=>{
-    setLoadingIntercept(!loading)
   await Promise.all([plot_functions.updateStatic(
       splatsRef.current,
       capture_data,
@@ -28,11 +20,7 @@ const Plots = (props) => {
       effortData,
       binSize,
       effortRef.current
-    )]).then(()=>{
-      console.log("I waited")
-      setLoadingIntercept(false)
-    })
-
+    )])
 
   }
 
@@ -66,7 +54,7 @@ const Plots = (props) => {
 
       <button
         className="btn-add-flex"
-        onClick={() => setShowEffort(!showEffort)}
+        onClick={() => {setShowEffort(!showEffort)}}
       >
         {showEffort ? "Hide" : "Show"} effort
       </button>

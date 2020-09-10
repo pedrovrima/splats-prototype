@@ -101,4 +101,4 @@ const updateEffort = (data, effDiv, dimensions) => {
   updateBars(svg, data, new_dimensions, axis);
   };
 
-module.exports = { createEffort, updateEffort };
+export default  { createEffort, updateEffort };

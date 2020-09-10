@@ -8,8 +8,8 @@ const PlotButtons = (props) => {
     selectedStations,
     setSelectedStations,
   } = props;
-  let [activeMenu, setActiveMenu] = useState("");
-
+  const [activeMenu, setActiveMenu] = useState("");
+  const [open,setOpen]=useState(false)
   const checker = (arr, target) => target.every((v) => arr.includes(v));
 
   const stationChecker = (stations, station_name) => {
@@ -24,9 +24,17 @@ const PlotButtons = (props) => {
         <div className="col-span-1 flex justify-center">
           <button
             className={` ${
-              activeMenu === "stations" ? "btn-top-active" : ""
+              activeMenu === "stations"   ? "btn-top-active" : ""
             } btn-top-add`}
-            onClick={() => setActiveMenu("stations")}
+            onClick={() => {
+                    if(activeMenu==="stations"){
+                      setActiveMenu("")
+
+                    }else{
+                      
+                      setActiveMenu("stations")
+                    }
+          }}
           >
             Stations{" "}
           </button>
@@ -37,8 +45,11 @@ const PlotButtons = (props) => {
             className={`${
               activeMenu === "bins" ? "btn-top-active" : ""
             } btn-top-add`}
-            onClick={() => setActiveMenu("bins")}
-          >
+            onClick={() => {
+              if(activeMenu==="bins"){setActiveMenu("")}else{
+                setActiveMenu("bins")
+              }
+    }}          >
             Bins{" "}
           </button>
         </div>
