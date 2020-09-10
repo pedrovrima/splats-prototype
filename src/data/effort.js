@@ -24475,4 +24475,4 @@ let effort_data=
     "effort_id": 4079
   }
 ]
-export default effort_data
+exports.effort_data = effort_data

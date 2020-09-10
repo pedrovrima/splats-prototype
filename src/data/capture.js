@@ -116456,4 +116456,4 @@ const capture_data=
     "effort_id": 4079
   }
 ]
-  export default capture_data
+  module.exports = {capture_data}

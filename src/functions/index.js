@@ -35,7 +35,8 @@ const organizeGroups = (data, variable) => {
 const createBins = (max, size) => {
   let number_of_bins = Math.ceil(max / size);
   let bins = [];
-  for (let i = 0; i < number_of_bins; i++) {
+  for (let i = 0; i < number
+    _of_bins; i++) {
     bins.push(5 + i * size);
   }
   return bins;
@@ -44,7 +45,7 @@ const createBins = (max, size) => {
 const findBin = (value, bins) => {
   let correctBin = bins.filter((bin, i) => {
     if (i + 1 < bins.length) {
-      return value <= bin+5 && value > bins[i - 1]-5;
+      return value <= bin+5 && value > bins[i - 1]+5;
     } else {
       return value <= bin;
     }
@@ -115,6 +116,7 @@ const variableGroupper = (data, variable, variable_name) => {
     let resu = {
       [variable_name]: group,
 
+      
       data: found_data,
     };
     return resu;
@@ -299,6 +301,7 @@ function newCreateD3(full_data, variables, effort_data, binSize) {
 
 
   let binned_data = nethour_data.map((datum) => binner(datum, bins));
+  
   let binsGroupped = bins.map((bin) => {
     let this_bin_data = binned_data.filter((datum) => datum.bin === bin);
     let this_bin_nethours = this_bin_data.reduce(
@@ -315,6 +318,7 @@ function newCreateD3(full_data, variables, effort_data, binSize) {
     );
     return { bin, data: this_bin_grouped_data, total_nh: this_bin_nethours, sqr_nh:srq_this_bin_nethours };
   });
+
   let binData = binsGroupped.map((datum) => {
     let groupMean = datum.data.map((group_datum) => {
       

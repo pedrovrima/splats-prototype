@@ -1,4 +1,4 @@
-module.exports = [
+const regions = [
   {
     region: "COAST",
     stations: ["PARK", "JACR", "HOME", "NAVR", "CABL","GATE","GELL","HOUS","KAHN","LEST","MOMA","SAC2","SACR","SHAY"],
@@ -222,5 +222,6 @@ stations:[
 "PRH1",
 "PRH2",
 "PRH3",
-]}
-];
+]}]
+
+module.exports = {regions}
