@@ -35,8 +35,7 @@ const organizeGroups = (data, variable) => {
 const createBins = (max, size) => {
   let number_of_bins = Math.ceil(max / size);
   let bins = [];
-  for (let i = 0; i < number
-    _of_bins; i++) {
+  for (let i = 0; i < number_of_bins; i++) {
     bins.push(5 + i * size);
   }
   return bins;

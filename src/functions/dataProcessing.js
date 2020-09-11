@@ -133,83 +133,164 @@ const binGroupper = (effort_data, bins) => {
   return bin_data;
 };
 
-const groupJoinner = (bin_data) => {
+const createGroupData = (groups) =>
+  groups.reduce((container, group) => {
+    return { ...container, [group]: [] };
+  }, {});
+
+const groupJoinner = (bin_data, groups) => {
   let data = bin_data.reduce(
     (container, bin, i) => {
-      const total_nh = container.total_nh + bin.nethours;
-      const pre_group_data = i === 0 ? bin.group_data : container.group_data;
-      const group_data = Object.keys(pre_group_data).reduce(
+      const nethours = bin.nethours ? bin.nethours : 0;
+      const total_nh = container.total_nh + nethours;
+      const group_data = Object.keys(container.group_data).reduce(
         (group_container, group, j) => {
-          const final_data =
-            i === 0
-              ? group_container[group]
-              : [...group_container[group], ...bin.group_data[group]];
+          const final_data = bin.group_data
+            ? [...group_container[group], ...bin.group_data[group]]
+            : group_container[group];
           return { ...group_container, [group]: final_data };
         },
-        pre_group_data
+        container.group_data
       );
 
       return { total_nh, group_data };
     },
-    { total_nh: 0, data: [], group_data: {} }
+    { total_nh: 0, data: [], group_data: createGroupData(groups) }
   );
 
   return data;
 };
 
-
-
-
-function newNHcalculator(group_data, data) {
-    if (group_data.data.length > 0) {
-      return (100 * group_data.data.length) / data.total_nh;
-    } else {
-      return 0;
-    }
+function NHCalculator(data, nh) {
+  if (data.length > 0) {
+    return (100 * data.length) / nh;
+  } else {
+    return 0;
   }
-  
-
-const birdsPerNh (bin_data)=>{
-    Object.keys(bin_data.group_data).map(group_kty=>{
-        
-    })
-
-
-
 }
 
+function SEcalculator(data, total_nh) {
+  if (data.length > 0) {
+    return (
+      2 *
+      100 *
+      Math.sqrt(
+        (Math.pow(0.5, 2) * Math.pow(total_nh, 2) * Math.pow(data.length, 2)) /
+          Math.pow(total_nh, 4) +
+          data.length / Math.pow(total_nh, 3)
+      )
+    );
+  } else {
+    return 0;
+  }
+}
+
+let SEScalculator = (datum) =>
+  Math.sqrt(
+    datum.reduce((sum, val) => {
+      return sum + Math.pow(val.se, 2);
+    }, 0)
+  );
+
+const binGroupProcessor = (bin_data, groups) =>
+  bin_data.map((bin) => {
+    const groups_data = groupJoinner(bin.data, groups);
+    const groupStats = Object.keys(groups_data.group_data).map((group_key) => {
+      const group_data = groups_data.group_data[group_key];
+
+      const groupsSE = SEcalculator(group_data, groups_data.total_nh);
+      const birdsPerNh = NHCalculator(group_data, groups_data.total_nh);
+      return { bin: bin.bin, group: group_key, se: groupsSE, bnh: birdsPerNh };
+    });
+    const binSe = SEScalculator(groupStats);
+    return { bin: bin.bin, bin_se: binSe, ...groups_data, groupStats };
+  });
+
+function numericGroups(groups) {
+  return groups.map((data, i) => i);
+}
+
+function flatten(arr) {
+  return arr.reduce(function (flat, toFlatten) {
+    return flat.concat(
+      Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten
+    );
+  }, []);
+}
+
+function binNestter(data) {
+  return d3
+    .nest()
+    .key((d) => d.bin)
+    .entries(data);
+}
+
+function stackerD3(data, groups) {
+  let stacked = d3
+    .stack()
+    .keys(numericGroups(groups))
+    .value(function (d, key) {
+      return d.values[key] ? d.values[key].bnh : 0;
+    })(data);
+
+  return stacked;
+}
 
 const data = dataProcessing(
   effort_data.effort_data,
   capture_data.capture_data,
   regions.regions
 );
-const groupped = regionGroupper(data, ["AgeClass", "SexClass"]);
-const groups = group_getter(groupped);
 
-const binned_coast = effortBinners(groupped.COAST.effort_data, [
-  50,
-  100,
-  150,
-  200,
-  250,
-  300,
-  365,
-]);
-const groupped_coast = groupGroupper(binned_coast, groups);
-const binned_data = binGroupper(groupped_coast, [
-  50,
-  100,
-  150,
-  200,
-  250,
-  300,
-  365,
-]);
+const groupProcessing = (data, variables) => {
+  const groupped_data = regionGroupper(data, ["AgeClass", "SexClass"]);
+  const groups = group_getter(groupped_data);
+  return { groupped_data, groups };
+};
+
+const groupped = groupProcessing(data, ["AgeClass", "SexClass"]);
 
 
 
+const createBins = (max, size) => {
+  let number_of_bins = Math.ceil(max / size);
+  let bins = [];
+  for (let i = 0; i < number_of_bins; i++) {
+    bins.push(5 + i * size);
+  }
+  return bins;
+};
 
 
+
+const binProcessing = (pre_groupped_data, region, binSize) => {
+  const bins = createBins(365,binSize)
+
+  const { groupped_data, groups } = pre_groupped_data;
+  const region_data = groupped_data[region];
+  
+  const processed_data=binGroupProcessor(binGroupper(groupGroupper(effortBinners(region_data.effort_data,bins),groups),bins),groups)
+  const justStats = processed_data.map((bin) => bin.groupStats);
+  const stacked = stackerD3(binNestter(flatten(justStats)),groups)
+  const flatStack=flatten(flatten(stacked))
+
+  return {
+    yMax:Math.max(...flatStack),
+    ses:processed_data.map(datum=>datum.bin_se),
+    stack: stacked,
+    groups: groups,
+    flat: flatten(processed_data),
+    effortData: processed_data.map(datum=>{return{value:datum.total_nh,group:datum.bin}})
+  };
+
+};
+
+
+console.log(binProcessing(groupped,"COAST",20))
+
+// const joined_groups = binGroupProcessor(binned_data)
+
+// console.log(SEScalculator(sesGroup(joined_groups)))
+// console.log(birdsPerNh(joined_groups))
 
 // console.log(groupGroupper(groupped.COAST.effort_data,["AHY","HY"])[395])
