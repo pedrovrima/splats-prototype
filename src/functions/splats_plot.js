@@ -31,7 +31,6 @@ const addBackground = (svg, dimensions) => {
 
 const selectAreaSvg = (svg, data) => svg.selectAll("mylayers").data(data.stack);
 
-
 const setStyle = (svg, data, color) =>
   svg.style("fill", function (d) {
     const name = data.groups[d.key];
@@ -39,21 +38,24 @@ const setStyle = (svg, data, color) =>
   });
 
 const addArea = (svg, axis) => {
-  svg.attr(
-    "d",
-    d3
-      .area()
-      .x(function (d, i) {
-        ;
-        return axis.x(d.data.key);
-      })
-      .y0(function (d) {
-        return axis.y(d[0]);
-      })
-      .y1(function (d) {
-        return axis.y(d[1]);
-      })
-  );
+  svg
+    .transition()
+    .ease(d3.easeCubic)
+    .duration(1500)
+    .attr(
+      "d",
+      d3
+        .area()
+        .x(function (d, i) {
+          return axis.x(d.data.key);
+        })
+        .y0(function (d) {
+          return axis.y(d[0]);
+        })
+        .y1(function (d) {
+          return axis.y(d[1]);
+        })
+    );
 };
 
 const createArea = (svg, data, color, axis) => {
@@ -76,10 +78,9 @@ const updateArea = async (svg, data, color, axis) => {
   addArea(paths, axis);
 };
 
-const createSplats = (splatsDiv, data, dimensions,yHook) => {
-  console.log(yHook)
+const createSplats = (splatsDiv, data, dimensions, yHook) => {
   const yData = functions.flatten(data.stack);
-  const axis = Axis(dimensions, yData,yHook);
+  const axis = Axis(dimensions, yData, yHook);
   const color = create_color(data.groups);
 
   var svg = createSvg(splatsDiv, dimensions);
@@ -91,9 +92,9 @@ const createSplats = (splatsDiv, data, dimensions,yHook) => {
   createLegend(svg, data, color, dimensions);
 };
 
-const updateSplats = (splatsDiv, data, dimensions,yHook) => {
+const updateSplats = (splatsDiv, data, dimensions, yHook) => {
   const yData = functions.flatten(data.stack);
-  const axis = Axis(dimensions, yData,yHook);
+  const axis = Axis(dimensions, yData, yHook);
   const color = create_color(data.groups);
   var svg = d3.select(splatsDiv);
 
@@ -103,4 +104,4 @@ const updateSplats = (splatsDiv, data, dimensions,yHook) => {
   updateLegend(svg, data, color, dimensions);
 };
 
-export default  { createSplats, updateSplats };
+export default { createSplats, updateSplats };

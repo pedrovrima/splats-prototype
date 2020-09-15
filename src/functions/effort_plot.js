@@ -17,7 +17,8 @@ const removeBars = (svg,height) =>
     .select("g.bars")
     .selectAll("rect")
     .transition()
-    .duration(500)
+    .ease(d3.easeCircleOut)
+    .duration(200)
     .attr("height", 0)
     .attr("y", height);
 
@@ -28,8 +29,6 @@ const addBars = (svg, data, dimensions, axis) =>
       return axis.x(d.group - 365 / data.length / 2);
     })
     .attr("y", dimensions.height)
-    .transition()
-    .duration(1000)
     .attr("y", function (d) {
       return axis.y(d.value);
     })

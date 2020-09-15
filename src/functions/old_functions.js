@@ -193,7 +193,7 @@ const updateEffort = (data, effDiv, width) => {
 [0,365]    )
 
   let xaxis = svg.select("g.effortX");
-  xaxis.transition().duration(1000).call(d3.axisBottom(x));
+  xaxis.call(d3.axisBottom(x));
 
   // Add Y axis
   var y = d3
@@ -201,12 +201,12 @@ const updateEffort = (data, effDiv, width) => {
     .domain([0, Math.max(...allNh)])
     .range([height, 0]);
 
-  svg.select("g.effortY").transition().duration(1000).call(d3.axisLeft(y));
+  svg.select("g.effortY").transition().duration(700).call(d3.axisLeft(y));
 
   // Bars
   let bars = svg.select("g.bars").selectAll("rect");
 
-  bars.transition().duration(1000).attr("height", 0).attr("y", height);
+  bars.transition().duration(700).attr("height", 0).attr("y", height);
 
   svg
     .select("g.bars")
@@ -217,7 +217,7 @@ const updateEffort = (data, effDiv, width) => {
     .append("rect")
     .merge(bars)
     .transition()
-    .duration(1000)
+    .duration(700)
     .attr("x", function (d) {
       return x(d.group);
     })
@@ -435,7 +435,7 @@ function updateStations(divId, data, variables, effort_data, bins, effDiv) {
     .append("path")
     .attr("class", "errorBar")
     .transition()
-    .duration(1000)
+    .duration(700)
     .attr(
       "d",
       d3
@@ -457,7 +457,7 @@ function updateStations(divId, data, variables, effort_data, bins, effDiv) {
     .append("path")
     .attr("class", "errorBar")
     .transition()
-    .duration(1000)
+    .duration(700)
 
     .attr(
       "d",
@@ -483,7 +483,7 @@ function updateStations(divId, data, variables, effort_data, bins, effDiv) {
     .append("path")
     .attr("class", "errorBar")
     .transition()
-    .duration(1000)
+    .duration(700)
 
     .attr(
       "d",
@@ -504,7 +504,7 @@ function updateStations(divId, data, variables, effort_data, bins, effDiv) {
 
   paths
     .transition()
-    .duration(1000)
+    .duration(700)
     .attr(
       "d",
       d3
@@ -579,7 +579,7 @@ console.timeEnd("path")
     .attr("text-anchor", "left")
     .style("alignment-baseline", "middle");
 
-  circles.transition().duration(1000);
+  circles.transition().duration(700);
   console.time("error")
   const newerrorData = newd3Data.stack[
     newd3Data.stack.length - 1

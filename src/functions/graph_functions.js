@@ -26,7 +26,7 @@ function createPlot(divId, d3Data, effDiv,yHook) {
   const dimensions = plot_dimensions(c_dimension, margins());
   
 
-
+  
 
   createEffort(d3Data.effortData, effDiv, default_dimensions);
   createSplats(divId, d3Data, dimensions,yHook);

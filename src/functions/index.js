@@ -1,4 +1,5 @@
 var d3 = require("d3");
+var data = require("../functions/dataProcessing") 
 
 const onlyUnique = (value, index, self) => {
   return self.indexOf(value) === index;
@@ -345,12 +346,14 @@ function newCreateD3(full_data, variables, effort_data, binSize) {
  
   const flatStack=flatten(flatten(stacked_data))
   return {
-    yMax:Math.max(...flatStack),
-    ses,
-    stack: stacked_data,
-    groups: groups,
-    flat: flatten(binData),
-    effortData
+
+    ...data
+    // yMax:Math.max(...flatStack),
+    // ses,
+    // stack: stacked_data,
+    // groups: groups,
+    // flat: flatten(binData),
+    // effortData
   };
 }
 

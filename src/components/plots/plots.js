@@ -3,31 +3,27 @@ import useDidMountEffect from "../../functions/didMountHook";
 import plot_functions from "../../functions/graph_functions";
 
 const Plots = (props) => {
-  let { plotData, yMax,drawPlot } = props;
+  let { plotData, yMax } = props;
 
   const splatsRef = useRef(null);
   const effortRef = useRef(null);
 
+
   const [showEffort, setShowEffort] = useState(false);
 
-  const asyncSetPlot = async () => {
-    await Promise.all([
-      plot_functions.updateStatic(
-        splatsRef.current,
-        plotData,
-        effortRef.current,
-        yMax
-      ),
-    ]);
-  };
 
-  useDidMountEffect(() => {
-    if(drawPlot){
-    asyncSetPlot()};
-  }, [plotData,yMax]);
+
+  useDidMountEffect(()=>{
+    plot_functions.updateStatic(
+      splatsRef.current,
+      plotData,
+      effortRef.current,
+      yMax
+    )
+  },[plotData,yMax])
 
   useEffect(() => {
-    if (splatsRef.current && drawPlot) {
+    if (splatsRef.current) {
       plot_functions.createPlot(
         splatsRef.current,
         plotData,

@@ -5,9 +5,7 @@ import App from './App';
 import './tailwind.output.css';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+    <App />,
   document.getElementById('root')
 );
 

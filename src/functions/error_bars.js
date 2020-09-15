@@ -5,6 +5,9 @@ const verticalBar = (svg, axis) => {
     .enter()
     .append("path")
     .attr("class", "errorBar")
+    .transition()
+    .ease(d3.easeCubic)
+    .duration(1500)
     .attr(
       "d",
       d3
@@ -27,6 +30,9 @@ const horizontalBar = (svg, axis, positive) => {
     .enter()
     .append("path")
     .attr("class", "errorBar")
+    .transition()
+    .ease(d3.easeCubic)
+    .duration(1500)
     .attr(
       "d",
       d3
