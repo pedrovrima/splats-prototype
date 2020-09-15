@@ -16,10 +16,7 @@ const createJulianDay = (string_date) => {
   return jDay;
 };
 
-
-
-
-const dataProcessing = (effort, captures) => {
+const dataProcessing = (effort, captures, regions) => {
   // Julian effort
 
   //put captures inside effort
@@ -256,8 +253,6 @@ const groupProcessing = (data, variables,from) => {
   const groups = group_getter(groupped_data).sort();
   return { groupped_data, groups };
 };
-
-
 
 
 const createBins = (max, size) => {
