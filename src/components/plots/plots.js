@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useState } from "react";
 import useDidMountEffect from "../../functions/didMountHook";
-import plot_functions from "../../functions/graph_functions";
+import plot_functions from "../../functions/completePlotFunction";
+
 
 const Plots = (props) => {
-  let { plotData, yMax } = props;
+  let { plotData,setBinSize,i,variables} = props;
 
   const splatsRef = useRef(null);
   const effortRef = useRef(null);
@@ -14,21 +15,24 @@ const Plots = (props) => {
 
 
   useDidMountEffect(()=>{
-    plot_functions.updateStatic(
-      splatsRef.current,
+    plot_functions.updatePlot(
       plotData,
+      splatsRef.current,
+
       effortRef.current,
-      yMax
-    )
-  },[plotData,yMax])
+i,variables    )
+  },[plotData,variables])
 
   useEffect(() => {
     if (splatsRef.current) {
       plot_functions.createPlot(
-        splatsRef.current,
         plotData,
+        splatsRef.current,
+        
         effortRef.current,
-        yMax
+        i,
+        variables
+        // yMax
       );
     }
   }, []);
@@ -49,6 +53,7 @@ const Plots = (props) => {
       >
         {showEffort ? "Hide" : "Show"} effort
       </button>
+
     </>
   );
 };

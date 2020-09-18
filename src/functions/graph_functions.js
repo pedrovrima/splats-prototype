@@ -6,7 +6,7 @@ import { default_dimensions } from "./plot_parts";
 const { createEffort, updateEffort } = effortPlots;
 const { createSplats, updateSplats } = splatsPlots;
 
-const container_dimensions = (width = 1000, height = 400) => {
+const container_dimensions = (width = 800, height = 300) => {
   return { width, height };
 };
 const margins = (top = 10, bottom = 30, left = 60, right = 60) => {
@@ -25,11 +25,11 @@ function createPlot(divId, d3Data, effDiv,yHook) {
   const c_dimension = container_dimensions();
   const dimensions = plot_dimensions(c_dimension, margins());
   
+  console.log(divId,effDiv)
 
-  
 
   createEffort(d3Data.effortData, effDiv, default_dimensions);
-  createSplats(divId, d3Data, dimensions,yHook);
+  const splat=createSplats(divId, d3Data, dimensions,yHook);
 }
 
 const updateStatic= async(divId, d3Data, effDiv,yHook)=> {

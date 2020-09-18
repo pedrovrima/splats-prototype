@@ -4,7 +4,7 @@ const d3 = require("d3");
 // Container creation
 
 // Dimensions
-const container_dimensions = (width = 1000, height = 400) => {
+const container_dimensions = (width = 800, height = 300) => {
     return { width, height };
   };
 

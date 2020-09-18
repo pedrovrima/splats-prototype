@@ -1,40 +1,43 @@
 import React, { useState } from "react";
-
+import { regions } from "../../data/regions";
 const PlotButtons = (props) => {
   let {
+    i,
     updateBinSize,
     binSize,
-    stations,
+    region,
     selectedStations,
-    setSelectedStations,
+    stationFuncs,
   } = props;
+
+  const stations = region
+    ? regions.filter((reg) => reg.region === region)[0].stations
+    : regions.reduce((cont,reg)=>[...cont,...reg.stations],[]);
+  console.log(region, selectedStations);
   const [activeMenu, setActiveMenu] = useState("");
-  const [open,setOpen]=useState(false)
   const checker = (arr, target) => target.every((v) => arr.includes(v));
 
   const stationChecker = (stations, station_name) => {
     stations.indexOf(station_name) < 0
-      ? setSelectedStations([...stations, station_name])
-      : setSelectedStations(stations.filter((stat) => stat !== station_name));
+      ? stationFuncs.addStation(i, station_name)
+      : stationFuncs.removeStation(i, station_name);
   };
 
   return (
     <>
-      <div className="grid grid-cols-2">
+      <div className="grid grid-cols-2 ">
         <div className="col-span-1 flex justify-center">
           <button
             className={` ${
-              activeMenu === "stations"   ? "btn-top-active" : ""
+              activeMenu === "stations" ? "btn-top-active" : ""
             } btn-top-add`}
             onClick={() => {
-                    if(activeMenu==="stations"){
-                      setActiveMenu("")
-
-                    }else{
-                      
-                      setActiveMenu("stations")
-                    }
-          }}
+              if (activeMenu === "stations") {
+                setActiveMenu("");
+              } else {
+                setActiveMenu("stations");
+              }
+            }}
           >
             Stations{" "}
           </button>
@@ -46,23 +49,26 @@ const PlotButtons = (props) => {
               activeMenu === "bins" ? "btn-top-active" : ""
             } btn-top-add`}
             onClick={() => {
-              if(activeMenu==="bins"){setActiveMenu("")}else{
-                setActiveMenu("bins")
+              if (activeMenu === "bins") {
+                setActiveMenu("");
+              } else {
+                setActiveMenu("bins");
               }
-    }}          >
+            }}
+          >
             Bins{" "}
           </button>
         </div>
       </div>
       <div>
         <div
-          className={`m-2 p-6 w-full  ${
+          className={`m-2 p-4 w-full h-64 overflow-y-scroll  ${
             activeMenu === "stations" ? "" : "hidden"
           }`}
         >
           {stations.map((stat) => (
             <button
-            key={stat}
+              key={stat}
               className={`btn-add ${
                 checker(selectedStations, [stat]) ? "btn-active" : ""
               }`}
@@ -75,7 +81,7 @@ const PlotButtons = (props) => {
         </div>
 
         <div
-          className={`m-2 p-6 flex justify-between ${
+          className={`m-2 p-4 w-full  ${
             activeMenu === "bins" ? "" : "hidden"
           }`}
         >
