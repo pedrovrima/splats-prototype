@@ -8,10 +8,10 @@ const NewPlot = (props)=>{
     const {setModal}=props
     return(
         <div
-        className={`bg-white w-10/12  rounded-lg m-2 p-6 shadow-md flex flex-col items-center`}
+        className={`bg-white w-full cursor-pointer  rounded-lg m-2 p-6 shadow-md flex flex-col items-center`} onClick={()=>setModal(true)}
       >
         <h1 className={`text-lg m-2`}>New Plot</h1>
-        <div className="h-6" onClick={setModal(true)}>
+        <div className="h-6  cursor-pointer" onClick={()=>setModal(true)}>
           <svg
             version="1.1"
             id="Capa_1"
@@ -35,3 +35,5 @@ const NewPlot = (props)=>{
       </div>
     )
 }
+
+export default NewPlot

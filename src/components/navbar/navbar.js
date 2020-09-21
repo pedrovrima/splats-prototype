@@ -2,7 +2,6 @@ import React, { useState } from "react";
 
 const NavBar = (props) => {
   const { variables, setVariables, maxYHook } = props;
-  console.log(variables.indexOf("SexClass") > -1);
   const [open, setOpen] = useState("");
   return (
     <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6">

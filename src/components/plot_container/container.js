@@ -27,12 +27,12 @@ const Container = (props) => {
   };
 
   return (
-    <div className={`flex items-center flex-col`}>
+    <div className={`flex items-center w-full flex-col`}>
       {plotInfo.map((plot, i) => {
         const regionData = this_region(plot);
         return (
           <div
-            className={`bg-white grid grid-cols-12  w-10/12  rounded-lg m-2 p-6 shadow-md`}
+            className={`bg-white grid grid-cols-12 w-full rounded-lg m-2 p-6 shadow-md`}
           >
             <div className={`col-span-11`}>
               <h1 className="font-sans">

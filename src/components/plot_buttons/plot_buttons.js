@@ -66,7 +66,7 @@ const PlotButtons = (props) => {
             activeMenu === "stations" ? "" : "hidden"
           }`}
         >
-          {stations.map((stat) => (
+          {stations.sort().map((stat) => (
             <button
               key={stat}
               className={`btn-add ${

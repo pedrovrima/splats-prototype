@@ -9,13 +9,14 @@ import useDidMountEffect from "./functions/didMountHook";
 import yHook from "./functions/maxYHook";
 import DataHook from "./functions/dataHook";
 import NavBar from "./components/navbar";
-import Modal from "./components/modal"
-
+import Modal from "./components/modal";
+import NewPlot from "./components/new_plot";
 
 // const d3 = require("d3");
 function App() {
+  const [modal, setModal] = useState(false);
   const dHook = DataHook();
-  
+
   useEffect(() => {
     dHook.addPlot("HOME");
   }, []);
@@ -34,23 +35,21 @@ function App() {
   // };
 
   return (
-    <div className="bg-gray-200 h-full">
+    <div className="bg-gray-200 min-h-screen w-full ">
+      <Modal active={modal} dHook={dHook} setModal={setModal}></Modal>
+
       <NavBar
         maxYHook={dHook.maxYHook}
         variables={groupVariables}
         setVariables={setGroupVariables}
       ></NavBar>
-
-      <Container DataHook={dHook} variables={groupVariables}></Container>
-
-      <button type="button" onClick={() => dHook.addPlot("PARK")}>
-        PARK
-      </button>
-      <button type="button" onClick={() => dHook.addByRegion("COAST")}>
-        COAST
-      </button>
-
-      {/* <button
+      <div className="flex flex-col items-center">
+        <div className="flex flex-col   w-10/12 items-center">
+          <p className="text-6xl font-extrabold">SWTH</p>
+          <Container DataHook={dHook} variables={groupVariables}></Container>
+          <NewPlot setModal={setModal}></NewPlot>
+        </div>
+        {/* <button
 
 
 type="button"
@@ -60,7 +59,7 @@ type="button"
           Download
         </button>
       </div> */}
-      <Modal active="true"></Modal>
+      </div>
     </div>
   );
 }
