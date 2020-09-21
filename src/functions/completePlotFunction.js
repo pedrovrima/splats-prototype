@@ -1,34 +1,28 @@
-import {plotDataProcessing} from "./newDataProcessing"
+import { plotDataProcessing } from "./newDataProcessing";
 import plot_functions from "./graph_functions";
-import data from "./effort_capture_joinner"
+import data from "./effort_capture_joinner";
 
+const createPlot = (plotInfo, splatRef, effRef, i, variables, maxYHook) => {
+  
+  const { yMax, fixedY, changeYMaxes } = maxYHook;
+  const { stations, binSize } = plotInfo;
+  const plotData = plotDataProcessing(data, binSize, stations, variables);
+  changeYMaxes(plotData.yMax, i);
+  const maxValue = fixedY ? yMax : plotData.yMax;
 
-const createPlot = (plotInfo,splatRef,effRef,yMax,variables )=>{
-    console.log(splatRef)
-    const {stations, binSize}=plotInfo
-    const plotData=plotDataProcessing(data, binSize,stations,variables)
-    plot_functions.createPlot(
-        splatRef,
-        plotData,
-        effRef,
-        plotData.yMax
-      );
-}
+  plot_functions.createPlot(splatRef, plotData, effRef, maxValue);
+};
 
+const updatePlot = (plotInfo, splatRef, effRef, i, variables, maxYHook) => {
+  const { yMax, fixedY, changeYMaxes } = maxYHook;
+  const { stations, binSize } = plotInfo;
 
+  const plotData = plotDataProcessing(data, binSize, stations, variables);
 
-const updatePlot = (plotInfo,splatRef,effRef,yMax,variables)=>{
-    const {stations, binSize}=plotInfo
+  changeYMaxes(plotData.yMax, i);
+  const maxValue = fixedY ? yMax : plotData.yMax;
 
-    const plotData=plotDataProcessing(data, binSize,stations,variables)
-    plot_functions.updateStatic(
-        splatRef,
-        plotData,
-        effRef,
-        yMax
-      );
+  plot_functions.updateStatic(splatRef, plotData, effRef, maxValue);
+};
 
-}
-
-
-export default {createPlot,updatePlot}
+export default { createPlot, updatePlot };
