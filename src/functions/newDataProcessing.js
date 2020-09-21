@@ -222,4 +222,4 @@ const plotDataProcessing = (data, binSize, stations, variables) => {
 
 
 
-module.exports={plotDataProcessing}
+export default plotDataProcessing

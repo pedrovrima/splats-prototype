@@ -1,4 +1,4 @@
-import { plotDataProcessing } from "./newDataProcessing";
+import plotDataProcessing from "./newDataProcessing";
 import plot_functions from "./graph_functions";
 import data from "./effort_capture_joinner";
 
