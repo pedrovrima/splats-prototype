@@ -66,15 +66,6 @@ const Modal = (props) => {
           </div>
           <ModalContent setModal={setModal} dHook={dHook}></ModalContent>
 
-          <div className="flex justify-end pt-2">
-            <button
-              type="button"
-              onClick={() => setModal(false)}
-              className="modal-close px-4 bg-indigo-500 p-3 rounded-lg text-white hover:bg-indigo-400"
-            >
-              Close
-            </button>
-          </div>
         </div>
       </div>
     </div>
