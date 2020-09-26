@@ -2,9 +2,10 @@ import functions from "./index";
 import effortPlots from "./effort_plot";
 import splatsPlots from "./splats_plot";
 import { default_dimensions } from "./plot_parts";
-
+import varPlots from "./var_plots"
 const { createEffort, updateEffort } = effortPlots;
 const { createSplats, updateSplats } = splatsPlots;
+const {createVariable, updateVariable} = varPlots;
 
 const container_dimensions = (width = 800, height = 300) => {
   return { width, height };
@@ -21,24 +22,26 @@ const plot_dimensions = (container_dimensions, margins) => {
   };
 };
 
-function createPlot(divId, d3Data, effDiv,yHook) {
+function createPlot(splatRef, varRef, effRef, plotData,yHook ) {
   const c_dimension = container_dimensions();
   const dimensions = plot_dimensions(c_dimension, margins());
   
-  console.log(divId,effDiv)
 
 
-  createEffort(d3Data.effortData, effDiv, default_dimensions);
-  const splat=createSplats(divId, d3Data, dimensions,yHook);
+  createEffort(effRef,plotData.effortData,  default_dimensions);
+  createSplats(splatRef, plotData.splats, dimensions,yHook);
+  createVariable(varRef,plotData.vari,dimensions,yHook)
 }
 
-const updateStatic= async(divId, d3Data, effDiv,yHook)=> {
+const updateStatic= async(splatRef, varRef, effRef, plotData, yHook)=> {
 
   
    
-  updateEffort(d3Data.effortData, effDiv, default_dimensions);
+  updateEffort(effRef,plotData.effortData, default_dimensions);
 
-  updateSplats(divId, d3Data, default_dimensions,yHook);
+  updateSplats(splatRef, plotData.splats, default_dimensions,yHook);
+  updateVariable(varRef, plotData.vari, default_dimensions,yHook);
+
   return("")
 }
 

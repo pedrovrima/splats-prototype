@@ -1,6 +1,7 @@
 const d3 = require("d3");
 
 const {
+  addYLabel,
   Axis,
   default_dimensions,
   addAxis,
@@ -59,7 +60,7 @@ const createBars = (svg, data, dimensions, axis) => {
   addBars(newBarsPrep(svg, data), data, dimensions, axis);
 };
 
-const createEffort = (data, effDiv, dimensions) => {
+const createEffort = (effDiv, data,  dimensions) => {
   let allNh = data.map((d) => d.value);
 
   const height = 200 - dimensions.margins.top - dimensions.margins.bottom;
@@ -75,11 +76,12 @@ const createEffort = (data, effDiv, dimensions) => {
   // X axis
   addAxis(svg, axis, height);
 
+  addYLabel(svg,"Total nh",new_dimensions)
   // Bars
   createBars(svg, data, new_dimensions, axis);
 };
 
-const updateEffort = (data, effDiv, dimensions) => {
+const updateEffort = (effDiv, data, dimensions) => {
   const height = 200 - dimensions.margins.top - dimensions.margins.bottom;
   const new_dimensions = { ...dimensions, height };
 

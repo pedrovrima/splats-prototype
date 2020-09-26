@@ -3,12 +3,16 @@ import useDidMountEffect from "../../functions/didMountHook";
 import plot_functions from "../../functions/completePlotFunction";
 
 const Plots = (props) => {
-  let { plotData, setBinSize, i, variables, maxYHook } = props;
+  let { plotData, setBinSize, i, variables, maxYHook,plot_variable } = props;
 
   const splatsRef = useRef(null);
   const effortRef = useRef(null);
+  const variablesRef = useRef(null);
+
 
   const [showEffort, setShowEffort] = useState(false);
+  const [showVariable, setShowVariable] = useState(false);
+
   const [changeY, setChangeY] = useState(0);
 
   
@@ -20,11 +24,13 @@ const Plots = (props) => {
     plot_functions.updatePlot(
       plotData,
       splatsRef.current,
+      variablesRef.current,
 
       effortRef.current,
       i,
       variables,
-      maxYHook
+      maxYHook,
+      plot_variable
     );
   }
   }, [ maxYHook.yMax]);
@@ -36,11 +42,13 @@ const Plots = (props) => {
     plot_functions.updatePlot(
       plotData,
       splatsRef.current,
+      variablesRef.current,
 
       effortRef.current,
       i,
       variables,
-      maxYHook
+      maxYHook,
+      plot_variable
     );
   }, [plotData, variables, maxYHook.fixedY]);
 
@@ -49,12 +57,13 @@ const Plots = (props) => {
       plot_functions.createPlot(
         plotData,
         splatsRef.current,
+        variablesRef.current,
 
         effortRef.current,
         i,
         variables,
-        maxYHook
-        // yMax
+        maxYHook,
+plot_variable        
       );
     }
   }, []);
@@ -62,6 +71,8 @@ const Plots = (props) => {
   return (
     <>
       <div ref={splatsRef} id="graph" />
+      <div         className={`${showVariable ? "" : "hidden"}`}
+ref={variablesRef} id="vari"></div>
       <div
         ref={effortRef}
         className={`${showEffort ? "" : "hidden"}`}
@@ -75,6 +86,17 @@ const Plots = (props) => {
       >
         {showEffort ? "Hide" : "Show"} effort
       </button>
+      <button
+        className="btn-add-flex"
+        onClick={() => {
+          setShowVariable(!showVariable);
+        }}
+      >
+        {showVariable ? "Hide" : "Show"} variable
+      </button>
+
+
+
     </>
   );
 };

@@ -1,6 +1,7 @@
 const d3 = require("d3");
 
 const {
+  addYLabel,
   Axis,
   addAxis,
   createSvg,
@@ -13,6 +14,8 @@ const functions = require("./index").default;
 
 const { createError, updateError } = require("./error_bars");
 const { createLegend, updateLegend } = require("./legend_plot");
+
+
 const addBackground = (svg, dimensions) => {
   svg
     .append("rect")
@@ -32,7 +35,8 @@ const addBackground = (svg, dimensions) => {
 const selectAreaSvg = (svg, data) => svg.selectAll("mylayers").data(data.stack);
 
 const setStyle = (svg, data, color) =>
-  svg.style("fill", function (d) {
+  svg.attr("class",(d)=>` area ${data.groups[d.key].replace(/\s+/g, '')}`)
+  .style("fill", function (d) {
     const name = data.groups[d.key];
     return color(name);
   });
@@ -42,6 +46,7 @@ const addArea = (svg, axis) => {
     .transition()
     .ease(d3.easeCubic)
     .duration(1500)
+    
     .attr(
       "d",
       d3
@@ -59,14 +64,14 @@ const addArea = (svg, axis) => {
 };
 
 const createArea = (svg, data, color, axis) => {
-  const path = svg.enter().append("path").attr("class", "area");
-
+  const path = svg.enter().append("path")
   setStyle(path, data, color);
   addArea(path, axis);
   addArea(path, axis);
 };
 
 const updateArea = async (svg, data, color, axis) => {
+  console.log(data)
   const paths = svg.select("g").selectAll("path.area").data(data.stack);
   paths.exit().remove();
 
@@ -86,6 +91,7 @@ const createSplats = (splatsDiv, data, dimensions, yHook) => {
   var svg = createSvg(splatsDiv, dimensions);
   addBackground(svg, dimensions);
   addAxis(svg, axis, dimensions.height);
+  addYLabel(svg,"Birds/100nh",dimensions)
   // tickHider();
   createArea(selectAreaSvg(svg, data), data, color, axis);
   createError(svg, data, axis);
@@ -97,6 +103,7 @@ const updateSplats = (splatsDiv, data, dimensions, yHook) => {
   const axis = Axis(dimensions, yData, yHook);
   const color = create_color(data.groups);
   var svg = d3.select(splatsDiv);
+  console.log(data)
 
   updateArea(svg, data, color, axis);
   updateYAxis(svg, axis);

@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 
 const NavBar = (props) => {
-  const { variables, setVariables, maxYHook } = props;
-  const [open, setOpen] = useState("");
+  const {
+    variables,
+    setVariables,
+    maxYHook,
+    setPlotVariables,
+    plot_variables,
+  } = props;
+  const [openGroupVar, setGroupOpen] = useState("");
   return (
     <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6">
       <div className="flex items-center flex-shrink-0 text-white mr-6">
@@ -43,10 +49,12 @@ const NavBar = (props) => {
                 type="button"
                 class="inline-flex px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 lg:mt-0"
                 onClick={() =>
-                  open === "variables" ? setOpen("") : setOpen("variables")
+                  openGroupVar === "variables"
+                    ? setGroupOpen("")
+                    : setGroupOpen("variables")
                 }
               >
-                <p className="font-bold">Variables</p>
+                <p className="font-bold">Group Variables</p>
                 <svg
                   class="-mr-1 ml-2 h-5 w-5"
                   viewBox="0 0 20 20"
@@ -63,7 +71,7 @@ const NavBar = (props) => {
           </div>
           <div
             className={`${
-              open === "variables" ? "" : "hidden"
+              openGroupVar === "variables" ? "" : "hidden"
             } origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg`}
           >
             <div class="rounded-md bg-white shadow-xs">
@@ -107,6 +115,80 @@ const NavBar = (props) => {
               </div>
             </div>
           </div>
+          {/* <div class="relative inline-block text-left">
+            <div>
+              <span class="rounded-md shadow-sm mx-3">
+                <button
+                  type="button"
+                  class="inline-flex px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 lg:mt-0"
+                  onClick={() =>
+                    openGroupVar === "variables"
+                      ? setGroupOpen("")
+                      : setGroupOpen("variables")
+                  }
+                >
+                  <p className="font-bold">Plot Variables</p>
+                  <svg
+                    class="-mr-1 ml-2 h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div
+              className={`${
+                openGroupVar === "variables" ? "" : "hidden"
+              } origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg`}
+            >
+              <div class="rounded-md bg-white shadow-xs">
+                <div
+                  class="py-1"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="options-menu"
+                >
+                  <label class="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
+                    <input
+                      class="mr-2 leading-tight"
+                      onChange={() =>
+                        plot_variables === "Weight"
+                          ? setPlotVariables(
+                              variables.filter((vari) => vari !== "AgeClass")
+                            )
+                          : setPlotVariables([...variables, "AgeClass"])
+                      }
+                      checked={variables.indexOf("AgeClass") > -1}
+                      type="checkbox"
+                    />
+                    <span class="text-sm">Age </span>
+                  </label>
+
+                  <label class="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
+                    <input
+                      class="mr-2 leading-tight"
+                      onChange={() =>
+                        variables.indexOf("SexClass") > -1
+                          ? setPlotVariables(
+                              variables.filter((vari) => vari !== "SexClass")
+                            )
+                          : setPlotVariables([...variables, "SexClass"])
+                      }
+                      checked={variables.indexOf("SexClass") > -1}
+                      type="checkbox"
+                    />
+                    <span class="text-sm">Sex </span>
+                  </label>
+                </div>
+              </div>
+            </div> */}
+          {/* </div> */}
         </div>
       </div>
     </nav>

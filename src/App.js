@@ -23,6 +23,8 @@ function App() {
 
   let [groupVariables, setGroupVariables] = useState(["AgeClass", "SexClass"]);
 
+  let [plot_variable, setPlotVariable] = useState("Weight");
+
   // const click = function () {
   //   const svg = d3.select("svg");
 
@@ -42,11 +44,12 @@ function App() {
         maxYHook={dHook.maxYHook}
         variables={groupVariables}
         setVariables={setGroupVariables}
+        setPlotVariable={setPlotVariable}
       ></NavBar>
       <div className="flex flex-col items-center">
         <div className="flex flex-col   w-10/12 items-center">
           <p className="text-6xl font-extrabold">SWTH</p>
-          <Container DataHook={dHook} variables={groupVariables}></Container>
+          <Container DataHook={dHook} variables={groupVariables} plot_variable={plot_variable}></Container>
           <NewPlot setModal={setModal}></NewPlot>
         </div>
         {/* <button

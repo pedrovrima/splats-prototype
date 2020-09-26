@@ -4,7 +4,7 @@ import { regions } from "../../data/regions";
 
 import PlotButtons from "../plot_buttons";
 const Container = (props) => {
-  const { DataHook, variables } = props;
+  const { DataHook, variables,plot_variable } = props;
 
   const {
     plotInfo,
@@ -71,6 +71,7 @@ const Container = (props) => {
             </div>
             <div className="col-span-9">
               <Plots
+              plot_variable={plot_variable}
                 i={i}
                 maxYHook={maxYHook}
                 plotData={plot}
