@@ -23,7 +23,7 @@ function App() {
 
   let [groupVariables, setGroupVariables] = useState(["AgeClass", "SexClass"]);
 
-  let [plot_variable, setPlotVariable] = useState("Weight");
+  let [plot_variable, setPlotVariable] = useState("WingLength");
 
   // const click = function () {
   //   const svg = d3.select("svg");
@@ -45,6 +45,7 @@ function App() {
         variables={groupVariables}
         setVariables={setGroupVariables}
         setPlotVariable={setPlotVariable}
+        plot_variable={plot_variable}
       ></NavBar>
       <div className="flex flex-col items-center">
         <div className="flex flex-col   w-10/12 items-center">

@@ -93,29 +93,33 @@ const capturesGroupSummer = (
 ) => {
   if (data.length > 0 && data[0][sum_variables] !== "NA") {
     const ordered_variables = group_variables.sort();
-    
+
     return data.reduce((counter, datum) => {
       let datumGroup = dataGroup(datum, ordered_variables);
-      
-      return !counter[datumGroup]? counter: {
-        ...counter,
-        [datumGroup]: {
-          sqsum:
-            counter[datumGroup].sqsum + Math.pow(data[0][sum_variables], 2),
-          sum: counter[datumGroup].sum + data[0][sum_variables],
-          length: counter[datumGroup].length + 1,
-        },
-      };
+
+      return !counter[datumGroup]
+        ? counter
+        : {
+            ...counter,
+            [datumGroup]: {
+              sqsum:
+                counter[datumGroup].sqsum + Math.pow(data[0][sum_variables], 2),
+              sum: counter[datumGroup].sum + data[0][sum_variables],
+              length: counter[datumGroup].length + 1,
+            },
+          };
     }, counter);
   } else {
     return counter;
   }
 };
 
-const binVariableTransformer = (bin_data, groups, variables,variable_name) => {
-  const counter = !groups.length?{["none"]: { sqsum: 0, sum: 0, length: 0 }}: groups.reduce((counter, group) => {
-    return { ...counter, [group]: { sqsum: 0, sum: 0, length: 0 } };
-  }, {});
+const binVariableTransformer = (bin_data, groups, variables, variable_name) => {
+  const counter = !groups.length
+    ? { ["none"]: { sqsum: 0, sum: 0, length: 0 } }
+    : groups.reduce((counter, group) => {
+        return { ...counter, [group]: { sqsum: 0, sum: 0, length: 0 } };
+      }, {});
 
   const data = bin_data.reduce(
     (container, bin, i) => {
@@ -250,7 +254,12 @@ const varMeanCalculator = (group_data) => {
 
 const varGroupProcessor = (bin_data, groups, variables, variable_name) => {
   return bin_data.map((bin) => {
-    const groups_data = binVariableTransformer(bin.data, groups, variables,variable_name);
+    const groups_data = binVariableTransformer(
+      bin.data,
+      groups,
+      variables,
+      variable_name
+    );
     const groupStats = Object.keys(groups_data.group_data).map((group_key) => {
       const group_data = groups_data.group_data[group_key];
 
@@ -285,9 +294,15 @@ function binNestter(data) {
     .entries(data);
 }
 
-const plotFullProcessing = (data, binSize, stations, variables,variable_name) => {
+const plotFullProcessing = (
+  data,
+  binSize,
+  stations,
+  variables,
+  variable_name
+) => {
   const bins = createBins(365, binSize);
-  console.log(variables)
+  console.log(variables);
   const groups = getGroups(data, variables);
 
   const stationData = filterStations(data.populated_effort, stations);
@@ -299,10 +314,19 @@ const plotFullProcessing = (data, binSize, stations, variables,variable_name) =>
   const justStats = processed_data.map((bin) => bin.groupStats);
   const stacked = stackerD3(binNestter(flatten(justStats)), groups);
   const flatStack = flatten(flatten(stacked));
-  const varprocessed_data = varGroupProcessor(binData, groups, variables,variable_name);
+  const varprocessed_data = varGroupProcessor(
+    binData,
+    groups,
+    variables,
+    variable_name
+  );
 
-  const varjustStats = flatten(varprocessed_data.map((bin) => bin.groupStats));
-
+  const varjustStats = flatten(
+    varprocessed_data.map((bin) =>
+      bin.groupStats    )
+  )
+  .filter(grp=>grp.se>0);
+  console.log("justState", varjustStats);
   const nested = d3
     .nest()
     .key((d) => d.group)
@@ -319,7 +343,7 @@ const plotFullProcessing = (data, binSize, stations, variables,variable_name) =>
     vari: {
       nested,
       groups,
-      name:variable_name,
+      name: variable_name,
       flat: varjustStats,
     },
 
@@ -328,6 +352,5 @@ const plotFullProcessing = (data, binSize, stations, variables,variable_name) =>
     }),
   };
 };
-
 
 export default { plotFullProcessing };

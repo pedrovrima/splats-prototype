@@ -50,7 +50,7 @@ const Plots = (props) => {
       maxYHook,
       plot_variable
     );
-  }, [plotData, variables, maxYHook.fixedY]);
+  }, [plotData, variables, maxYHook.fixedY,plot_variable]);
 
   useEffect(() => {
     if (splatsRef.current) {

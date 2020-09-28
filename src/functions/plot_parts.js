@@ -65,7 +65,9 @@ const specialyAxis = (y_data, height, yHook) => {
   const maximum = y_data.max;
   const minimum = y_data.min;
 
-  return d3.scaleLinear().domain([minimum, maximum]).range([height, 0]).nice();
+  return d3.scaleLinear()
+  .domain([minimum, maximum])
+  .range([height, 0]).nice()
 };
 
 const Axis = (dimensions, y_data, max_y) => {
@@ -95,8 +97,8 @@ const addXAxis = (svg, x, height) => {
     .style("text-anchor", "end");
 };
 
-const addYAxis = (svg, y) =>
-  svg.append("g").attr("class", "yAxis").call(d3.axisLeft(y));
+const addYAxis = (svg, y) =>{
+  return svg.append("g").attr("class", "yAxis").call(d3.axisLeft(y).ticks(5));}
 
 const addAxis = (svg, axis, height) => {
   addXAxis(svg, axis.x, height);
@@ -104,7 +106,7 @@ const addAxis = (svg, axis, height) => {
 };
 
 const updateYAxis = (svg, axis) => {
-  svg.select("g.yAxis").transition().duration(1000).call(d3.axisLeft(axis.y));
+  svg.select("g.yAxis").transition().duration(1000).call(d3.axisLeft(axis.y).ticks(5));
 };
 
 const tickHider = () => {
