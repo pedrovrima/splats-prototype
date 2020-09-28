@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/splats-prototype/static/css/main.01e36add.chunk.css",
-    "main.js": "/splats-prototype/static/js/main.82301992.chunk.js",
-    "main.js.map": "/splats-prototype/static/js/main.82301992.chunk.js.map",
+    "main.css": "/splats-prototype/static/css/main.95398564.chunk.css",
+    "main.js": "/splats-prototype/static/js/main.1fb99452.chunk.js",
+    "main.js.map": "/splats-prototype/static/js/main.1fb99452.chunk.js.map",
     "runtime-main.js": "/splats-prototype/static/js/runtime-main.dc140329.js",
     "runtime-main.js.map": "/splats-prototype/static/js/runtime-main.dc140329.js.map",
     "static/js/2.5f9142b8.chunk.js": "/splats-prototype/static/js/2.5f9142b8.chunk.js",
     "static/js/2.5f9142b8.chunk.js.map": "/splats-prototype/static/js/2.5f9142b8.chunk.js.map",
     "index.html": "/splats-prototype/index.html",
-    "precache-manifest.8577db4ba54b8bc1ef2f0787cf610995.js": "/splats-prototype/precache-manifest.8577db4ba54b8bc1ef2f0787cf610995.js",
+    "precache-manifest.0237ed93de5ea41860e4aeb60b33dd4f.js": "/splats-prototype/precache-manifest.0237ed93de5ea41860e4aeb60b33dd4f.js",
     "service-worker.js": "/splats-prototype/service-worker.js",
-    "static/css/main.01e36add.chunk.css.map": "/splats-prototype/static/css/main.01e36add.chunk.css.map",
+    "static/css/main.95398564.chunk.css.map": "/splats-prototype/static/css/main.95398564.chunk.css.map",
     "static/js/2.5f9142b8.chunk.js.LICENSE.txt": "/splats-prototype/static/js/2.5f9142b8.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.dc140329.js",
     "static/js/2.5f9142b8.chunk.js",
-    "static/css/main.01e36add.chunk.css",
-    "static/js/main.82301992.chunk.js"
+    "static/css/main.95398564.chunk.css",
+    "static/js/main.1fb99452.chunk.js"
   ]
 }
