@@ -97,16 +97,38 @@ const addXAxis = (svg, x, height) => {
     .style("text-anchor", "end");
 };
 
-const addYAxis = (svg, y) =>{
-  return svg.append("g").attr("class", "yAxis").call(d3.axisLeft(y).ticks(5));}
+const addYAxis = (svg, y,total_ticks=10) =>{
+  
+  return svg.append("g").attr("class", "yAxis").call(d3.axisLeft(y).ticks(total_ticks));}
 
-const addAxis = (svg, axis, height) => {
+
+
+const addYAxisSpecial = (svg, y,total_ticks=10,tickArr)=>{
+  console.log(total_ticks)
+  return svg.append("g").attr("class", "yAxis").call(d3.axisLeft(y).ticks(total_ticks).tickFormat((d,i) => tickArr[i]));
+}
+
+const addAxis = (svg, axis, height,vars) => {
   addXAxis(svg, axis.x, height);
   addYAxis(svg, axis.y);
 };
 
-const updateYAxis = (svg, axis) => {
-  svg.select("g.yAxis").transition().duration(1000).call(d3.axisLeft(axis.y).ticks(5));
+
+const addSpecialAxis = (svg, axis, height,vars) => {
+  addXAxis(svg, axis.x, height);
+  addYAxisSpecial(svg, axis.y,vars.length,vars);
+};
+
+const updateYAxis = (svg, axis,total_ticks=10) => {
+  console.log(total_ticks)
+  svg.select("g.yAxis").transition().duration(1000).call(d3.axisLeft(axis.y).ticks(total_ticks));
+};
+
+
+const updateYAxisSpecial = (svg, axis,total_ticks=10,tickArr) => {
+  console.log(total_ticks)
+  svg.select("g.yAxis").transition().duration(1000).call(d3.axisLeft(axis.y).ticks(total_ticks).tickFormat((d,i) => tickArr[i])
+  );
 };
 
 const tickHider = () => {
@@ -158,7 +180,9 @@ module.exports = {
   default_dimensions,
   create_color,
   addAxis,
+  addSpecialAxis,
   updateYAxis,
   createSvg,
   addYLabel,
+  updateYAxisSpecial
 };

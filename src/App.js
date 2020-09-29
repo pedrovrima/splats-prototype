@@ -23,7 +23,8 @@ function App() {
 
   let [groupVariables, setGroupVariables] = useState(["AgeClass", "SexClass"]);
 
-  let [plot_variable, setPlotVariable] = useState("WingLength");
+  let [plot_variable, setPlotVariable] = useState(    {name:"WingLength",label:"Wing Length"},
+  );
 
   // const click = function () {
   //   const svg = d3.select("svg");

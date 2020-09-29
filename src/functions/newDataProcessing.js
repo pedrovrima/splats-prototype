@@ -299,7 +299,7 @@ const plotFullProcessing = (
   binSize,
   stations,
   variables,
-  variable_name
+  variable_data
 ) => {
   const bins = createBins(365, binSize);
   console.log(variables);
@@ -318,7 +318,7 @@ const plotFullProcessing = (
     binData,
     groups,
     variables,
-    variable_name
+    variable_data.name
   );
 
   const varjustStats = flatten(
@@ -343,7 +343,7 @@ const plotFullProcessing = (
     vari: {
       nested,
       groups,
-      name: variable_name,
+      variable_data: variable_data,
       flat: varjustStats,
     },
 

@@ -13,8 +13,14 @@ const NavBar = (props) => {
     {name:"WingLength",label:"Wing Length"},
     {name:"Weight",label:"Weight"},
     {name:"Condition",label:"Condition"},
-    {name:"Fat",label:"Fat",values:["None","Trace","Low","Medium","High","Bulging"]}
-    
+    {name:"Fat",label:"Fat",values:["None","Trace","Low","Medium","High","Bulging"]},
+    {name:"Skull",label:"Skull",values:["None","Trace","Less","Half","Greater","Almost","Full"]},
+    {name:"Juv",label:"Juvenal Plumage",values:["None","<Half","Half",">Half","Full"]},
+    {name:"BMolt",label:"Body Molt",values:["None","Trace","Light","Medium","Heavy"]},
+    {name:"FFMolt",label:"FF Molt",values:["None","Symmetrical"]},
+    {name:"FFWear",label:"FF Wear",values:["None","Slight","Light","Moderate","Heavy","Excessive"]},
+    {name:"Cloaca",label:"Cloacal Protuberance",values:["None","Small","Medium","Large"]},
+    {name:"Brood",label:"Brood Patch",values:["None","Smooth","Vascularized","Heavy","Wrinkled","Molting"]},
   ]
   const {
     variables,
@@ -297,13 +303,9 @@ const CharacterOption = (props) => {
       <input
         class="mr-2 leading-tight"
         onChange={() =>
-          variables.indexOf(this_variable.name) > -1
-            ? setVariables(
-                variables.filter((vari) => vari !== this_variable.name)
-              )
-            : setVariables(this_variable.name)
+              setVariables(this_variable)
         }
-        checked={variables.indexOf(this_variable.name) > -1}
+        checked={variables.name===this_variable.name}
         type="radio"
       />
       <span class="text-sm">{this_variable.label} </span>

@@ -5,8 +5,10 @@ const {
   specialAxis,
   Axis,
   addAxis,
+  addSpecialAxis,
   createSvg,
   updateYAxis,
+  updateYAxisSpecial,
   tickHider,
   create_color,
 } = require("./plot_parts");
@@ -126,6 +128,7 @@ const addHorizontalLines = (svg, data, color, axis) => {
 };
 
 const createVariable = (splatsDiv, data, dimensions, yHook) => {
+  
   console.log(data)
   const yDataMax = d3.max(data.flat, function (d) {
     return +d.mean + d.se;
@@ -135,13 +138,14 @@ const createVariable = (splatsDiv, data, dimensions, yHook) => {
       return +d.mean - d.se;
     }
   });
-  const y_data = { max: yDataMax, min: yDataMin };
+  const y_data = data.variable_data.values?{max:data.variable_data.values.length-1,min:0}:{ max: yDataMax, min: yDataMin };
   const axis = specialAxis(dimensions, y_data, yHook);
   const color = create_color(data.groups);
   var svg = createSvg(splatsDiv, dimensions);
   addBackground(svg, dimensions);
-  addYLabel(svg,data.name,dimensions,"vari")
-  addAxis(svg, axis, dimensions.height);
+  addYLabel(svg,data.variable_data.label,dimensions,"vari")
+  data.variable_data.values?
+  addSpecialAxis(svg, axis, dimensions.height,data.variable_data.values):addAxis(svg, axis, dimensions.height)
   // tickHider();
   data.nested.map((dn) => {
     var lines = svg.selectAll("lines").data(dn);
@@ -164,11 +168,11 @@ const updateVariable = (splatsDiv, data, dimensions, yHook) => {
       return +d.mean - d.se;
     }
   });
-  const y_data = { max: yDataMax, min: yDataMin };
+  const y_data = data.variable_data.values?{max:data.variable_data.values.length-1,min:0}:{ max: yDataMax, min: yDataMin };
   const axis = specialAxis(dimensions, y_data, yHook);
   const color = create_color(data.groups);
   var svg = d3.select(splatsDiv);
-  updateYAxis(svg, axis, dimensions.height);
+  data.variable_data.values?updateYAxisSpecial(svg, axis,data.variable_data.values.length,data.variable_data.values):updateYAxis(svg, axis,);
   const lines = svg.select("g").selectAll(`.lineplot`).data([]);
 
   lines.exit().remove();
@@ -176,8 +180,7 @@ const updateVariable = (splatsDiv, data, dimensions, yHook) => {
   
 
   svg.select("g").selectAll("text.vari").remove()
-  console.log(data.name)
-  addYLabel(svg.select("g"),data.name,dimensions,"vari")
+  addYLabel(svg.select("g"),data.variable_data.label,dimensions,"vari")
 
   data.nested.map((dn) => {
     addHorizontalLines(lines, dn, color, axis);
