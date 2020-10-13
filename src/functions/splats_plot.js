@@ -7,6 +7,8 @@ const {
   createSvg,
   updateYAxis,
   tickHider,
+  updateSvg,
+  updateXAxis,
   create_color,
 } = require("./plot_parts");
 
@@ -71,7 +73,6 @@ const createArea = (svg, data, color, axis) => {
 };
 
 const updateArea = async (svg, data, color, axis) => {
-  console.log(data)
   const paths = svg.select("g").selectAll("path.area").data(data.stack);
   paths.exit().remove();
 
@@ -87,7 +88,6 @@ const createSplats = (splatsDiv, data, dimensions, yHook) => {
   const yData = functions.flatten(data.stack);
   const axis = Axis(dimensions, yData, yHook);
   const color = create_color(data.groups);
-
   var svg = createSvg(splatsDiv, dimensions);
   addBackground(svg, dimensions);
   addAxis(svg, axis, dimensions.height);
@@ -103,10 +103,10 @@ const updateSplats = (splatsDiv, data, dimensions, yHook) => {
   const axis = Axis(dimensions, yData, yHook);
   const color = create_color(data.groups);
   var svg = d3.select(splatsDiv);
-  console.log(data)
-
+  updateSvg(svg,dimensions)
   updateArea(svg, data, color, axis);
   updateYAxis(svg, axis);
+  updateXAxis(svg,axis);
   updateError(svg, data, axis);
   updateLegend(svg, data, color, dimensions);
 };

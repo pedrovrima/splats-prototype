@@ -5,7 +5,6 @@ const Modal = (props) => {
   const { active, setModal,dHook } = props;
 
   document.onkeydown = function (evt) {
-    console.log(evt);
     evt = evt || window.event;
     var isEscape = false;
     if ("key" in evt) {

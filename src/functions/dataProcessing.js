@@ -444,7 +444,6 @@ const groupsNhCalc = (nh,counter)=>{
   const binData = newBinGroupper(stationData, bins);
   
 
-  console.log(binProcessing(data,10,["HOME","PARK"],["AgeClass"]))
 
 //   console.log(binTransformer(binData[25].data,groups, ["SexClass", "AgeClass"]))
 

@@ -302,7 +302,6 @@ const plotFullProcessing = (
   variable_data
 ) => {
   const bins = createBins(365, binSize);
-  console.log(variables);
   const groups = getGroups(data, variables);
 
   const stationData = filterStations(data.populated_effort, stations);
@@ -326,7 +325,6 @@ const plotFullProcessing = (
       bin.groupStats    )
   )
   .filter(grp=>grp.se>0);
-  console.log("justState", varjustStats);
   const nested = d3
     .nest()
     .key((d) => d.group)

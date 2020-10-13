@@ -8,12 +8,26 @@ const PlotButtons = (props) => {
     region,
     selectedStations,
     stationFuncs,
+    regionFuncs
   } = props;
 
-  const stations = region
-    ? regions.filter((reg) => reg.region === region)[0].stations
-    : regions.reduce((cont,reg)=>[...cont,...reg.stations],[]);
-  console.log(region, selectedStations);
+
+  
+
+
+
+  const setStations = (region) => {
+    console.log(region);
+    return region
+      ? regions.filter((reg) => reg.region === region)[0].stations
+      : [];
+  };
+
+  const flatten = (arr) => arr.reduce((cont, arr) => [...cont, ...arr], []);
+
+  const allStations = regions.reduce((cont, reg) => [...cont, ...reg.stations],[])
+
+  const regionStations = flatten(region.map((reg) => setStations(reg)));
   const [activeMenu, setActiveMenu] = useState("");
   const checker = (arr, target) => target.every((v) => arr.includes(v));
 
@@ -23,9 +37,18 @@ const PlotButtons = (props) => {
       : stationFuncs.removeStation(i, station_name);
   };
 
+
+  const regionChecker = (regions, this_regions) => {
+    regions.indexOf(this_regions) < 0
+      ? regionFuncs.addRegion(i, this_regions)
+      : stationFuncs.removeStation(i, this_regions);
+  };
+
+
+
   return (
     <>
-      <div className="grid grid-cols-2 ">
+      <div className="grid grid-cols-3 ">
         <div className="col-span-1 flex justify-center">
           <button
             className={` ${
@@ -59,14 +82,54 @@ const PlotButtons = (props) => {
             Bins{" "}
           </button>
         </div>
+
+        <div className="col-span-1 flex justify-center">
+          <button
+            className={`${
+              activeMenu === "regions" ? "btn-top-active" : ""
+            } btn-top-add`}
+            onClick={() => {
+              if (activeMenu === "regions") {
+                setActiveMenu("");
+              } else {
+                setActiveMenu("regions");
+              }
+            }}
+          >
+            Regions{" "}
+          </button>
+        </div>
       </div>
       <div>
+        <div
+          className={`m-2 p-4 w-full h-64 overflow-y-scroll  ${
+            activeMenu === "regions" ? "" : "hidden"
+          }`}
+        >
+          {regions.map((reg) => (
+            <button
+              key={reg.region}
+              className={`btn-add ${
+                checker(region, [reg.region]) ? "btn-active" : ""
+              }`}
+              type="button"
+              onClick={() => regionChecker(region, reg.region)}
+            >
+              {reg.region}
+            </button>
+          ))}
+        </div>
         <div
           className={`m-2 p-4 w-full h-64 overflow-y-scroll  ${
             activeMenu === "stations" ? "" : "hidden"
           }`}
         >
-          {stations.sort().map((stat) => (
+
+          {
+            region.map(reg=>(
+              <>
+            <h3 className="ml-0 mt-2 mb-1  text-gray-900">{reg}</h3>
+              {setStations(reg).sort().map((stat) => (
             <button
               key={stat}
               className={`btn-add ${
@@ -78,12 +141,31 @@ const PlotButtons = (props) => {
               {stat}
             </button>
           ))}
+              </>
+            ))
+          }
+            <h3 className="ml-0 mt-2 mb-1  text-gray-900">Other Stations</h3>
+
+          {
+
+          allStations.sort().map((stat) => {
+            if(regionStations.indexOf(stat)<0)
+            {return (
+            <button
+              key={stat}
+              className={`btn-add ${
+                checker(selectedStations, [stat]) ? "btn-active" : ""
+              }`}
+              type="button"
+              onClick={() => stationChecker(selectedStations, stat)}
+            >
+              {stat}
+            </button>
+          )}})}
         </div>
 
         <div
-          className={`m-2 p-4 w-full  ${
-            activeMenu === "bins" ? "" : "hidden"
-          }`}
+          className={`m-2 p-4 w-full  ${activeMenu === "bins" ? "" : "hidden"}`}
         >
           <button
             className={`btn-add ${binSize === 5 ? "btn-active" : ""}`}

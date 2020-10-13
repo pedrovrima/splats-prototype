@@ -4,7 +4,7 @@ import { regions } from "../../data/regions";
 
 import PlotButtons from "../plot_buttons";
 const Container = (props) => {
-  const { DataHook, variables,plot_variable } = props;
+  const { DataHook, variables, plot_variable } = props;
 
   const {
     plotInfo,
@@ -13,35 +13,57 @@ const Container = (props) => {
     addStation,
     removeStation,
     maxYHook,
+    addRegion,
   } = DataHook;
 
-  const this_region = (plot) =>
-    regions.filter((reg) => reg.region === plot.region)[0];
+  const this_regions = (dataRegions) => {
+    return dataRegions
+      ? regions.filter((reg) => dataRegions.indexOf(reg.region) > -1)
+      : null;
+  };
+  let checker = (arr, target) => target.every((v) => arr.includes(v));
 
   const regionh1 = (stations, regionData) => {
-    if (stations.length === regionData.stations.length) {
-      return regionData.region;
-    } else {
-      return regionData.region + "*";
-    }
+    console.log(regionData);
+    const title = regionData
+      .map((region) => {
+        if (checker(stations, region.stations)) {
+          return region.region;
+        } else {
+          return region.region + "*";
+        }
+      })
+      .join(", ");
+    return title;
+  };
+
+  const stationh1 = (stations, regionData) => {
+    const all_region_stations = regionData.reduce((cont,reg) => [...cont,...reg.stations],[]);
+    console.log(all_region_stations);
+    const solo_stations = stations.filter(
+      (stat) => all_region_stations.indexOf(stat) < 0
+    );
+    const hasRegion = regionData.length > 0 && solo_stations.length>0 ? " + " : "";
+
+    return `${hasRegion}${solo_stations.join(", ")}`;
   };
 
   return (
     <div className={`flex items-center w-full flex-col`}>
       {plotInfo.map((plot, i) => {
-        const regionData = this_region(plot);
+        console.log(plot);
+        const regionData = this_regions(plot.regions);
         return (
           <div
             className={`bg-white grid grid-cols-12 w-full rounded-lg m-2 p-6 shadow-md`}
           >
-            <div className={`col-span-11`}>
-              <h1 className="font-sans">
-                {plot.region
-                  ? regionh1(plot.stations, regionData)
-                  : plot.stations.length
-                  ? plot.stations.join(", ")
-                  : "none"}
-              </h1>
+            <div className={`col-span-11 m-4`}>
+              <span className="font-sans text-3xl text-gray-900 font-extrabold">
+                {`${regionh1(plot.stations, regionData)}`}</span><span className="font-sans text-3xl text-gray-700 font-bold"> {`${stationh1(
+                  plot.stations,
+                  regionData
+                )}`}
+              </span>
             </div>
             <div className="col-span-1 flex justify-end items-start">
               <button type="button" onClick={() => removePlot(i)}>
@@ -69,9 +91,9 @@ const Container = (props) => {
                 </svg>{" "}
               </button>
             </div>
-            <div className="col-span-9">
+            <div className="col-span-8">
               <Plots
-              plot_variable={plot_variable}
+                plot_variable={plot_variable}
                 i={i}
                 maxYHook={maxYHook}
                 plotData={plot}
@@ -80,21 +102,20 @@ const Container = (props) => {
               ></Plots>
             </div>
 
-            <div className="col-span-3">
+            <div className="col-span-4">
               <PlotButtons
-                region={plot.region}
+                region={plot.regions}
                 i={i}
                 stationFuncs={{ addStation, removeStation }}
                 selectedStations={plot.stations}
                 binSize={plot.binSize}
+                regionFuncs={{ addRegion }}
                 updateBinSize={changeBinSize(i)}
               ></PlotButtons>
             </div>
           </div>
         );
       })}
-
-
     </div>
   );
 };

@@ -129,7 +129,6 @@ const addHorizontalLines = (svg, data, color, axis) => {
 
 const createVariable = (splatsDiv, data, dimensions, yHook) => {
   
-  console.log(data)
   const yDataMax = d3.max(data.flat, function (d) {
     return +d.mean + d.se;
   });
@@ -158,7 +157,6 @@ const createVariable = (splatsDiv, data, dimensions, yHook) => {
 };
 
 const updateVariable = (splatsDiv, data, dimensions, yHook) => {
-  console.log(data)
   const yDataMax = d3.max(data.flat, function (d) {
     return +d.mean + d.se;
   });
@@ -168,7 +166,7 @@ const updateVariable = (splatsDiv, data, dimensions, yHook) => {
       return +d.mean - d.se;
     }
   });
-  const y_data = data.variable_data.values?{max:data.variable_data.values.length-1,min:0}:{ max: yDataMax, min: yDataMin };
+  const y_data = { max: yDataMax, min: yDataMin };
   const axis = specialAxis(dimensions, y_data, yHook);
   const color = create_color(data.groups);
   var svg = d3.select(splatsDiv);

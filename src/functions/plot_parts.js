@@ -57,7 +57,6 @@ const yAxis = (y_data, height, yHook) => {
 };
 
 const specialyAxis = (y_data, height, yHook) => {
-  console.log(y_data);
   // console.log(yHook,y_data,came)
   // if(yHook){
   //   yHook.checkYMax(maxFunction(y_data))
@@ -65,9 +64,7 @@ const specialyAxis = (y_data, height, yHook) => {
   const maximum = y_data.max;
   const minimum = y_data.min;
 
-  return d3.scaleLinear()
-  .domain([minimum, maximum])
-  .range([height, 0]).nice()
+  return d3.scaleLinear().domain([minimum, maximum]).range([height, 0]).nice();
 };
 
 const Axis = (dimensions, y_data, max_y) => {
@@ -97,38 +94,62 @@ const addXAxis = (svg, x, height) => {
     .style("text-anchor", "end");
 };
 
-const addYAxis = (svg, y,total_ticks=10) =>{
-  
-  return svg.append("g").attr("class", "yAxis").call(d3.axisLeft(y).ticks(total_ticks));}
+const addYAxis = (svg, y, total_ticks = 10) => {
+  return svg
+    .append("g")
+    .attr("class", "yAxis")
+    .call(d3.axisLeft(y).ticks(total_ticks));
+};
 
+const addYAxisSpecial = (svg, y, total_ticks = 10, tickArr) => {
+  return svg
+    .append("g")
+    .attr("class", "yAxis")
+    .call(
+      d3
+        .axisLeft(y)
+        .ticks(total_ticks)
+        .tickFormat((d, i) => tickArr[i])
+    );
+};
 
-
-const addYAxisSpecial = (svg, y,total_ticks=10,tickArr)=>{
-  console.log(total_ticks)
-  return svg.append("g").attr("class", "yAxis").call(d3.axisLeft(y).ticks(total_ticks).tickFormat((d,i) => tickArr[i]));
-}
-
-const addAxis = (svg, axis, height,vars) => {
+const addAxis = (svg, axis, height, vars) => {
   addXAxis(svg, axis.x, height);
   addYAxis(svg, axis.y);
 };
 
-
-const addSpecialAxis = (svg, axis, height,vars) => {
+const addSpecialAxis = (svg, axis, height, vars) => {
   addXAxis(svg, axis.x, height);
-  addYAxisSpecial(svg, axis.y,vars.length,vars);
+  addYAxisSpecial(svg, axis.y, vars.length, vars);
 };
 
-const updateYAxis = (svg, axis,total_ticks=10) => {
-  console.log(total_ticks)
-  svg.select("g.yAxis").transition().duration(1000).call(d3.axisLeft(axis.y).ticks(total_ticks));
+const updateYAxis = (svg, axis, total_ticks = 10) => {
+  svg
+    .select("g.yAxis")
+    .transition()
+    .duration(1000)
+    .call(d3.axisLeft(axis.y).ticks(total_ticks));
 };
 
+const updateXAxis = (svg, axis, total_ticks = 10) => {
+  svg
+    .select("g.xAxis")
+    .transition()
+    .duration(1000)
+    .call(d3.axisBottom(axis.x).ticks(total_ticks));
+};
 
-const updateYAxisSpecial = (svg, axis,total_ticks=10,tickArr) => {
-  console.log(total_ticks)
-  svg.select("g.yAxis").transition().duration(1000).call(d3.axisLeft(axis.y).ticks(total_ticks).tickFormat((d,i) => tickArr[i])
-  );
+const updateYAxisSpecial = (svg, axis, total_ticks = 10, tickArr) => {
+  svg
+    .select("g.yAxis")
+    .transition()
+    .duration(1000)
+    .call(
+      d3
+        .axisLeft(axis.y)
+        .ticks(total_ticks)
+        .tickFormat((d, i) => tickArr[i])
+    );
 };
 
 const tickHider = () => {
@@ -161,6 +182,13 @@ const createSvg = (div, dimensions) =>
         dimensions.margins.top +
         ")"
     );
+
+const updateSvg = (svg, dimensions) => {
+  svg.style(
+    "width",
+    dimensions.width + dimensions.margins.left + dimensions.margins.right
+  );
+};
 const addYLabel = (svg, text, dimensions, type) => {
   svg
     .append("text")
@@ -184,5 +212,7 @@ module.exports = {
   updateYAxis,
   createSvg,
   addYLabel,
-  updateYAxisSpecial
+  updateYAxisSpecial,
+  updateXAxis,
+  updateSvg,
 };

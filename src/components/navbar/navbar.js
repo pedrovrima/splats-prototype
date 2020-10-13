@@ -151,7 +151,6 @@ const FixY = (props) => {
 };
 
 const GroupVarMenu = (props) => {
-  console.log(props);
   const {variableSet,variableHook}= props
   const { variables, setVariables,  } = variableHook;
 
@@ -235,7 +234,6 @@ const GroupOptions = (props) => {
 
 
 const CharacterVarMenu = (props) => {
-  console.log(props);
   const {variableSet,variableHook}= props
   const { variables, setVariables,  } = variableHook;
 

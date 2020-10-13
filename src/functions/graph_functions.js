@@ -10,11 +10,12 @@ const {createVariable, updateVariable} = varPlots;
 const container_dimensions = (width = 800, height = 300) => {
   return { width, height };
 };
-const margins = (top = 10, bottom = 30, left = 60, right = 60) => {
-  return { top, bottom, left, right };
+const margins = (dimensions) => {
+  return { top:dimensions.height*0.03, bottom:dimensions.height*0.1, left:dimensions.width*0.1, right:dimensions.width*0.1 };
 };
 
 const plot_dimensions = (container_dimensions, margins) => {
+
   return {
     width: container_dimensions.width - margins.left - margins.right,
     height: container_dimensions.height - margins.bottom - margins.top,
@@ -23,8 +24,8 @@ const plot_dimensions = (container_dimensions, margins) => {
 };
 
 function createPlot(splatRef, varRef, effRef, plotData,yHook ) {
-  const c_dimension = container_dimensions();
-  const dimensions = plot_dimensions(c_dimension, margins());
+  const c_dimension = container_dimensions(splatRef.clientWidth);
+  const dimensions = plot_dimensions(c_dimension, margins(c_dimension));
   
 
 
@@ -34,13 +35,15 @@ function createPlot(splatRef, varRef, effRef, plotData,yHook ) {
 }
 
 const updateStatic= async(splatRef, varRef, effRef, plotData, yHook)=> {
+  const c_dimension = container_dimensions(splatRef.clientWidth);
+  const dimensions = plot_dimensions(c_dimension, margins(c_dimension));
 
   
-   
-  updateEffort(effRef,plotData.effortData, default_dimensions);
 
-  updateSplats(splatRef, plotData.splats, default_dimensions,yHook);
-  updateVariable(varRef, plotData.vari, default_dimensions,yHook);
+  updateEffort(effRef,plotData.effortData, dimensions);
+
+  updateSplats(splatRef, plotData.splats, dimensions,yHook);
+  updateVariable(varRef, plotData.vari, dimensions,yHook);
 
   return("")
 }

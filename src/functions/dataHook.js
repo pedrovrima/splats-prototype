@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { regions } from "../data/regions";
 
 const newPlotInfo = (stations) => {
-  return { stations:[stations], binSize: 10, region: null, yMax:10 };
+  return { stations: [stations], binSize: 10, regions: [], yMax: 10 };
 };
 
 const newRegionPlot = (region) => {
@@ -10,7 +10,8 @@ const newRegionPlot = (region) => {
   return {
     stations: regionData[0].stations,
     binSize: 10,
-    region: regionData[0].region, yMax:10
+    regions: [regionData[0].region],
+    yMax: 10,
   };
 };
 
@@ -22,8 +23,9 @@ const DataHook = () => {
   const [yMax, setYMax] = useState(20);
   const [fixedY, setFixedY] = useState(false);
 
-
-    useEffect(() => setYMax(Math.max(...plotInfo.map(plot=>plot.yMax))), [plotInfo]);
+  useEffect(() => setYMax(Math.max(...plotInfo.map((plot) => plot.yMax))), [
+    plotInfo,
+  ]);
 
   const addVariables = (variable) => setVariables(...variables, variable);
   const removeVariable = (variable) =>
@@ -38,9 +40,20 @@ const DataHook = () => {
     setPlotInfo([...plotInfo.slice(0, i), ...plotInfo.slice(i + 1)]);
   };
 
+  const addRegion = (plot_i, region) => {
+    const regionData = regions.filter((reg) => reg.region === region)[0];
+    const stations = [...plotInfo[plot_i].stations, ...regionData.stations];
+    console.log(stations);
+    const final_regions = [...plotInfo[plot_i].regions, region];
+    setPlotInfo([
+      ...plotInfo.slice(0, plot_i),
+      { ...plotInfo[plot_i], regions: final_regions, stations },
+      ...plotInfo.slice(plot_i + 1),
+    ]);
+  };
+
   const addStation = (plot_i, station) => {
     const stations = [...plotInfo[plot_i].stations, station];
-    console.log(stations)
 
     setPlotInfo([
       ...plotInfo.slice(0, plot_i),
@@ -53,9 +66,8 @@ const DataHook = () => {
     const stations = plotInfo[plot_i].stations.filter(
       (stat) => stat !== station
     );
-        console.log(stations)
 
-     setPlotInfo([
+    setPlotInfo([
       ...plotInfo.slice(0, plot_i),
       { ...plotInfo[plot_i], stations },
       ...plotInfo.slice(plot_i + 1),
@@ -71,11 +83,9 @@ const DataHook = () => {
 
   const changeYMaxes = (value, i) => {
     const newPlotInfo = [...plotInfo];
-    console.log(newPlotInfo[i].yMax,value)
-    newPlotInfo[i].yMax=value
+    newPlotInfo[i].yMax = value;
     setPlotInfo(newPlotInfo);
   };
-
 
   const maxYHook = { yMax, fixedY, changeYMaxes, setFixedY };
 
@@ -91,6 +101,7 @@ const DataHook = () => {
     changeBinSize,
     addByRegion,
     maxYHook,
+    addRegion,
   };
 };
 
