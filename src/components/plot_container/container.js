@@ -14,6 +14,8 @@ const Container = (props) => {
     removeStation,
     maxYHook,
     addRegion,
+    removeRegion,
+    collapser
   } = DataHook;
 
   const this_regions = (dataRegions) => {
@@ -24,7 +26,6 @@ const Container = (props) => {
   let checker = (arr, target) => target.every((v) => arr.includes(v));
 
   const regionh1 = (stations, regionData) => {
-    console.log(regionData);
     const title = regionData
       .map((region) => {
         if (checker(stations, region.stations)) {
@@ -39,7 +40,6 @@ const Container = (props) => {
 
   const stationh1 = (stations, regionData) => {
     const all_region_stations = regionData.reduce((cont,reg) => [...cont,...reg.stations],[]);
-    console.log(all_region_stations);
     const solo_stations = stations.filter(
       (stat) => all_region_stations.indexOf(stat) < 0
     );
@@ -51,7 +51,6 @@ const Container = (props) => {
   return (
     <div className={`flex items-center w-full flex-col`}>
       {plotInfo.map((plot, i) => {
-        console.log(plot);
         const regionData = this_regions(plot.regions);
         return (
           <div
@@ -99,6 +98,9 @@ const Container = (props) => {
                 plotData={plot}
                 setBinSize={changeBinSize}
                 variables={variables}
+                hyCollapse ={collapser.hy}
+                ahyCollapse={collapser.ahy}
+
               ></Plots>
             </div>
 
@@ -109,8 +111,9 @@ const Container = (props) => {
                 stationFuncs={{ addStation, removeStation }}
                 selectedStations={plot.stations}
                 binSize={plot.binSize}
-                regionFuncs={{ addRegion }}
+                regionFuncs={{ addRegion, removeRegion }}
                 updateBinSize={changeBinSize(i)}
+                
               ></PlotButtons>
             </div>
           </div>

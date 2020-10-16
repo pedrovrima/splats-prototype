@@ -1,5 +1,5 @@
 const d3 = require("d3");
-
+const chroma = require("chroma-js")
 // Container creation
 
 // Dimensions
@@ -26,12 +26,44 @@ const default_dimensions = plot_dimensions(container_dimensions(), margins());
 
 // Colors
 
+// const create_color = (groups) => {
+//   const color = d3
+//     .scaleOrdinal()
+//     .domain(groups)
+//     .range(["#D64B4B", "#D6914B", "#D6D64B", "#4BD74B", "#4BD8D8", "#4C4CD9"]);
+//   return color;
+// };
+
+const sexColor=(grp,color)=>{
+  return /F/.test(grp)? chroma(color).darken():/M/.test(grp)?chroma(color).brighten():color
+}
+
+
 const create_color = (groups) => {
-  const color = d3
-    .scaleOrdinal()
-    .domain(groups)
-    .range(["#D64B4B", "#D6914B", "#D6D64B", "#4BD74B", "#4BD8D8", "#4C4CD9"]);
-  return color;
+  return (grp) => {
+    if(groups.length>6){
+    if (/^AHY/.test(grp)) {
+      return sexColor(grp,"#D64B4B");
+    }
+    if (/^HY/.test(grp)) {
+      return sexColor(grp,"#4BD74B");
+    }
+    if (/^ASY/.test(grp)) {
+      return sexColor(grp,"#D6914B");
+    }
+    if (/^SY/.test(grp)) {
+      return sexColor(grp,"#4C4CD9");
+    }
+    if (/^TY/.test(grp)) {
+      return sexColor(grp,"#4BD8D8");
+    }
+    if (/^ATY/.test(grp)) {
+      return sexColor(grp,"#D6D64B");
+    }}else{
+    
+          return ["#D64B4B","#4BD74B", "#4C4CD9","#D6914B", "#4BD8D8",  "#D6D64B",][groups.indexOf(grp)]
+        }
+  };
 };
 
 //   Axis
@@ -200,6 +232,7 @@ const addYLabel = (svg, text, dimensions, type) => {
     .style("text-anchor", "middle")
     .text(text);
 };
+
 
 module.exports = {
   specialAxis,

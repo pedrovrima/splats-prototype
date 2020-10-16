@@ -3,40 +3,43 @@ import useDidMountEffect from "../../functions/didMountHook";
 import plot_functions from "../../functions/completePlotFunction";
 
 const Plots = (props) => {
-  let { plotData, setBinSize, i, variables, maxYHook,plot_variable } = props;
+  let {
+    plotData,
+    setBinSize,
+    i,
+    variables,
+    maxYHook,
+    plot_variable,
+    hyCollapse,
+    ahyCollapse,
+  } = props;
 
   const splatsRef = useRef(null);
   const effortRef = useRef(null);
   const variablesRef = useRef(null);
-
 
   const [showEffort, setShowEffort] = useState(false);
   const [showVariable, setShowVariable] = useState(false);
 
   const [changeY, setChangeY] = useState(0);
 
-  
-
-
-
   useDidMountEffect(() => {
-    if(maxYHook.fixedY){
-    plot_functions.updatePlot(
-      plotData,
-      splatsRef.current,
-      variablesRef.current,
+    if (maxYHook.fixedY) {
+      plot_functions.updatePlot(
+        plotData,
+        splatsRef.current,
+        variablesRef.current,
 
-      effortRef.current,
-      i,
-      variables,
-      maxYHook,
-      plot_variable
-    );
-  }
-  }, [ maxYHook.yMax]);
-
-
-
+        effortRef.current,
+        i,
+        variables,
+        maxYHook,
+        plot_variable,
+        hyCollapse,
+        ahyCollapse
+      );
+    }
+  }, [maxYHook.yMax]);
 
   useDidMountEffect(() => {
     plot_functions.updatePlot(
@@ -48,9 +51,13 @@ const Plots = (props) => {
       i,
       variables,
       maxYHook,
-      plot_variable
+      plot_variable,
+      hyCollapse,
+      ahyCollapse
     );
-  }, [plotData, variables, maxYHook.fixedY,plot_variable]);
+  }, [plotData, variables, maxYHook.fixedY, plot_variable,    hyCollapse,
+    ahyCollapse,
+]);
 
   useEffect(() => {
     if (splatsRef.current) {
@@ -63,7 +70,9 @@ const Plots = (props) => {
         i,
         variables,
         maxYHook,
-plot_variable        
+        plot_variable,
+        hyCollapse,
+        ahyCollapse
       );
     }
   }, []);
@@ -71,8 +80,11 @@ plot_variable
   return (
     <>
       <div ref={splatsRef} id="graph" />
-      <div         className={`${showVariable ? "" : "hidden"}`}
-ref={variablesRef} id="vari"></div>
+      <div
+        className={`${showVariable ? "" : "hidden"}`}
+        ref={variablesRef}
+        id="vari"
+      ></div>
       <div
         ref={effortRef}
         className={`${showEffort ? "" : "hidden"}`}
@@ -94,9 +106,6 @@ ref={variablesRef} id="vari"></div>
       >
         {showVariable ? "Hide" : "Show"} variable
       </button>
-
-
-
     </>
   );
 };

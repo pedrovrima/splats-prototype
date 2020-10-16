@@ -10,38 +10,95 @@ const NavBar = (props) => {
   ];
 
   const charactVariable = [
-    {name:"WingLength",label:"Wing Length"},
-    {name:"Weight",label:"Weight"},
-    {name:"Condition",label:"Condition"},
-    {name:"Fat",label:"Fat",values:["None","Trace","Low","Medium","High","Bulging"]},
-    {name:"Skull",label:"Skull",values:["None","Trace","Less","Half","Greater","Almost","Full"]},
-    {name:"Juv",label:"Juvenal Plumage",values:["None","<Half","Half",">Half","Full"]},
-    {name:"BMolt",label:"Body Molt",values:["None","Trace","Light","Medium","Heavy"]},
-    {name:"FFMolt",label:"FF Molt",values:["None","Symmetrical"]},
-    {name:"FFWear",label:"FF Wear",values:["None","Slight","Light","Moderate","Heavy","Excessive"]},
-    {name:"Cloaca",label:"Cloacal Protuberance",values:["None","Small","Medium","Large"]},
-    {name:"Brood",label:"Brood Patch",values:["None","Smooth","Vascularized","Heavy","Wrinkled","Molting"]},
-  ]
+    { name: "WingLength", label: "Wing Length" },
+    { name: "Weight", label: "Weight" },
+    { name: "Condition", label: "Condition" },
+    {
+      name: "Fat",
+      label: "Fat",
+      values: ["None", "Trace", "Low", "Medium", "High", "Bulging"],
+    },
+    {
+      name: "Skull",
+      label: "Skull",
+      values: ["None", "Trace", "Less", "Half", "Greater", "Almost", "Full"],
+    },
+    {
+      name: "Juv",
+      label: "Juvenal Plumage",
+      values: ["None", "<Half", "Half", ">Half", "Full"],
+    },
+    {
+      name: "BMolt",
+      label: "Body Molt",
+      values: ["None", "Trace", "Light", "Medium", "Heavy"],
+    },
+    { name: "FFMolt", label: "FF Molt", values: ["None", "Symmetrical"] },
+    {
+      name: "FFWear",
+      label: "FF Wear",
+      values: ["None", "Slight", "Light", "Moderate", "Heavy", "Excessive"],
+    },
+    {
+      name: "Cloaca",
+      label: "Cloacal Protuberance",
+      values: ["None", "Small", "Medium", "Large"],
+    },
+    {
+      name: "Brood",
+      label: "Brood Patch",
+      values: [
+        "None",
+        "Smooth",
+        "Vascularized",
+        "Heavy",
+        "Wrinkled",
+        "Molting",
+      ],
+    },
+  ];
   const {
     variables,
     setVariables,
     maxYHook,
     setPlotVariable,
     plot_variable,
+    collapserHook
   } = props;
   return (
     <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6">
       <Logo></Logo>
       <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
         <FixY maxYHook={maxYHook}></FixY>
-        <GroupVarMenu variableSet={groupVariables} variableHook={{ variables, setVariables }}></GroupVarMenu>
+        <GroupVarMenu
+          variableSet={groupVariables}
+          variableHook={{ variables, setVariables }}
+        ></GroupVarMenu>
         <CharacterVarMenu
-        variableSet={charactVariable}
+          variableSet={charactVariable}
           variableHook={{
             variables: plot_variable,
             setVariables: setPlotVariable,
           }}
-        >A</CharacterVarMenu>
+        >
+        </CharacterVarMenu>
+        <CheckBox
+        value={collapserHook.collapser.hy}
+        setter={collapserHook.changeHYcollapser}
+        
+        >
+          HY Sex collapser
+          
+        </CheckBox>
+
+        <CheckBox
+        value={collapserHook.collapser.ahy}
+        setter={collapserHook.changeAHYcollapser}
+        
+        >
+          AHY Age collapser
+          
+        </CheckBox>
         {/* <div class="relative inline-block text-left">
             <div>
               <span class="rounded-md shadow-sm mx-3">
@@ -151,8 +208,8 @@ const FixY = (props) => {
 };
 
 const GroupVarMenu = (props) => {
-  const {variableSet,variableHook}= props
-  const { variables, setVariables,  } = variableHook;
+  const { variableSet, variableHook } = props;
+  const { variables, setVariables } = variableHook;
 
   const [openGroupVar, setGroupOpen] = useState("");
 
@@ -232,10 +289,9 @@ const GroupOptions = (props) => {
   );
 };
 
-
 const CharacterVarMenu = (props) => {
-  const {variableSet,variableHook}= props
-  const { variables, setVariables,  } = variableHook;
+  const { variableSet, variableHook } = props;
+  const { variables, setVariables } = variableHook;
 
   const [openGroupVar, setGroupOpen] = useState("");
 
@@ -300,14 +356,30 @@ const CharacterOption = (props) => {
     <label class="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
       <input
         class="mr-2 leading-tight"
-        onChange={() =>
-              setVariables(this_variable)
-        }
-        checked={variables.name===this_variable.name}
+        onChange={() => setVariables(this_variable)}
+        checked={variables.name === this_variable.name}
         type="radio"
       />
       <span class="text-sm">{this_variable.label} </span>
     </label>
   );
 };
+
+
+const CheckBox = (props) => {
+  const { value, setter, children } = props;
+
+  return (
+    <label class="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
+      <input
+        class="mr-2 leading-tight"
+        onClick={() => setter()}
+        checked={value}
+        type="radio"
+      />
+      <span class="text-lg font-extrabold text-white">{children} </span>
+    </label>
+  );
+};
+
 export default NavBar;

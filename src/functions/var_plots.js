@@ -166,7 +166,8 @@ const updateVariable = (splatsDiv, data, dimensions, yHook) => {
       return +d.mean - d.se;
     }
   });
-  const y_data = { max: yDataMax, min: yDataMin };
+  const y_data = data.variable_data.values?{max:data.variable_data.values.length-1,min:0}:{ max: yDataMax, min: yDataMin };
+
   const axis = specialAxis(dimensions, y_data, yHook);
   const color = create_color(data.groups);
   var svg = d3.select(splatsDiv);

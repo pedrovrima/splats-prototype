@@ -72,7 +72,7 @@ const removeLegend = (svg, data) => {
   const circles = svg
     .select("g")
     .selectAll("circle")
-    .data(data.groups)
+    .data([])
     .exit()
     .remove();
   const textRemove = svg

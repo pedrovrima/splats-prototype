@@ -7,7 +7,7 @@ const { createEffort, updateEffort } = effortPlots;
 const { createSplats, updateSplats } = splatsPlots;
 const {createVariable, updateVariable} = varPlots;
 
-const container_dimensions = (width = 800, height = 300) => {
+const container_dimensions = (width = 800, height = 500) => {
   return { width, height };
 };
 const margins = (dimensions) => {
@@ -27,7 +27,6 @@ function createPlot(splatRef, varRef, effRef, plotData,yHook ) {
   const c_dimension = container_dimensions(splatRef.clientWidth);
   const dimensions = plot_dimensions(c_dimension, margins(c_dimension));
   
-
 
   createEffort(effRef,plotData.effortData,  default_dimensions);
   createSplats(splatRef, plotData.splats, dimensions,yHook);

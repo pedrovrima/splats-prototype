@@ -43,6 +43,7 @@ function App() {
 
       <NavBar
         maxYHook={dHook.maxYHook}
+        collapserHook={dHook.collapserHook}
         variables={groupVariables}
         setVariables={setGroupVariables}
         setPlotVariable={setPlotVariable}

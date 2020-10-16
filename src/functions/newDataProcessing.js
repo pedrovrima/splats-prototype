@@ -1,4 +1,5 @@
 var d3 = require("d3");
+var _d3Array = require("d3-array");
 
 const createBins = (max, size) => {
   let number_of_bins = Math.ceil(max / size);
@@ -19,25 +20,42 @@ function flatten(arr) {
   }, []);
 }
 
-const arrayPaster = (array1, array2) =>
-  flatten(array1.map((arr1) => array2.map((arr2) => valuePaster(arr1, arr2))));
+const hyCollapseRemover = (value1, value2, hyCollapse) => {
+  return value1 === "HY" ? (!hyCollapse ? value2 : "") : value2;
+};
 
-const longPaster = (arrays) => {
+const ageCollapser=(value,ahyCollapse)=> 
+{
+  console.log(value)
+  return value==="HY"||value.length===1?value:ahyCollapse?"AHY":value
+}
+
+const arrayPaster = (array1, array2, hyCollapse) =>
+  flatten(
+    array1.map((arr1) =>
+      array2.map((arr2) => valuePaster(arr1, hyCollapseRemover(arr1, arr2, hyCollapse)))
+    )
+  );
+
+const longPaster = (arrays, hyCollapse,ahyCollapse) => {
   return arrays.reduce((container, arr, i) => {
     if (i === 0) {
-      return arr;
+      return arr.map(ar1=>ageCollapser(ar1,ahyCollapse));
     } else {
-      return arrayPaster(container, arr);
+      return arrayPaster(container, arr, hyCollapse);
     }
   }, []);
 };
 
-const getGroups = (data, variables) => {
+const uniqueArray = (arr) => [...new Set(arr)];
+
+const getGroups = (data, variables, hyCollapse,ahyCollapse) => {
   const { groups } = data;
   const selectedGroups = groups.filter(
     (group) => variables.indexOf(group.variable) > -1
   );
-  return longPaster(selectedGroups.map((datum) => datum.data));
+  const groups2 = longPaster(selectedGroups.map((datum) => datum.data),hyCollapse,ahyCollapse);
+  return uniqueArray(groups2);
 };
 
 const filterStations = (effort, stations) => {
@@ -66,17 +84,24 @@ const newBinGroupper = (effort_data, bins) => {
   return bin_data;
 };
 
-const dataGroup = (data, variables) => {
-  return variables.reduce((group, varName, i) => {
-    return i === 0 ? `${data[varName]}` : `${group} ${data[varName]}`;
-  }, []);
+const dataGroup = (data, variables, hyCollapse,ahyCollapse) => {
+  const group= variables.reduce((group, varName, i) => {
+    return i === 0
+      ? `${ageCollapser(data[varName],ahyCollapse)}`
+      : `${group} ${
+        hyCollapseRemover(group,
+         data[varName],hyCollapse
+         )
+        }`;
+  }, "");
+  return group
 };
 
-const capturesGroupCounter = (data, groups, variables, counter) => {
+const capturesGroupCounter = (data, groups, variables, counter,hyCollapse,ahyCollapse) => {
   if (data.length > 0) {
     const ordered_variiables = variables.sort();
     return data.reduce((counter, datum) => {
-      let datumGroup = dataGroup(datum, ordered_variiables);
+      let datumGroup = dataGroup(datum, ordered_variiables,hyCollapse,ahyCollapse);
       return { ...counter, [datumGroup]: counter[datumGroup] + 1 };
     }, counter);
   } else {
@@ -89,32 +114,42 @@ const capturesGroupSummer = (
   groups,
   group_variables,
   sum_variables,
-  counter
+  counter,hyCollapse,ahyCollapse
 ) => {
-  if (data.length > 0 && data[0][sum_variables] !== "NA") {
+  if (data.length > 0) {
     const ordered_variables = group_variables.sort();
 
-    return data.reduce((counter, datum) => {
-      let datumGroup = dataGroup(datum, ordered_variables);
+    return data.reduce((counter, datum, i) => {
+      let datumGroup = dataGroup(datum, ordered_variables,hyCollapse,ahyCollapse);
+      const recounter =
+        !counter[datumGroup] || data[i][sum_variables.name] === "NA"
+          ? counter
+          : {
+              ...counter,
+              [datumGroup]: {
+                sqsum:
+                  counter[datumGroup].sqsum +
+                  Math.pow(data[i][sum_variables.name], 2),
+                sum: counter[datumGroup].sum + data[i][sum_variables.name],
+                length: counter[datumGroup].length + 1,
+              },
+            };
 
-      return !counter[datumGroup]
-        ? counter
-        : {
-            ...counter,
-            [datumGroup]: {
-              sqsum:
-                counter[datumGroup].sqsum + Math.pow(data[0][sum_variables], 2),
-              sum: counter[datumGroup].sum + data[0][sum_variables],
-              length: counter[datumGroup].length + 1,
-            },
-          };
+        return recounter
     }, counter);
   } else {
     return counter;
   }
 };
 
-const binVariableTransformer = (bin_data, groups, variables, variable_name) => {
+const binVariableTransformer = (
+  bin_data,
+  groups,
+  variables,
+  variable_data,
+  bin_num,
+  hyCollapse,ahyCollapse
+) => {
   const counter = !groups.length
     ? { ["none"]: { sqsum: 0, sum: 0, length: 0 } }
     : groups.reduce((counter, group) => {
@@ -130,10 +165,10 @@ const binVariableTransformer = (bin_data, groups, variables, variable_name) => {
         bin.capture_data,
         groups,
         variables,
-        variable_name,
-        counter
+        variable_data,
+         counter,
+        hyCollapse,ahyCollapse
       );
-
       const group_data = Object.keys(container.group_data).reduce(
         (new_container, key) => {
           return {
@@ -152,11 +187,17 @@ const binVariableTransformer = (bin_data, groups, variables, variable_name) => {
     },
     { total_nh: 0, data: [], sq_nh: 0, group_data: counter }
   );
-
-  return data;
+  const new_data = Object.keys(data.group_data).reduce(
+    (container, grp) =>
+      data.group_data[grp].length > 4
+        ? { ...container, [grp]: data.group_data[grp] }
+        : { ...container, [grp]: { sqsum: 0, sum: 0, length: 0 } },
+    data.group_data
+  );
+  return { ...data, group_data: new_data };
 };
 
-const binSplatsTransformer = (bin_data, groups, variables) => {
+const binSplatsTransformer = (bin_data, groups, variables,hyCollapse,ahyCollapse) => {
   const counter = groups.reduce((counter, group) => {
     return { ...counter, [group]: 0 };
   }, {});
@@ -170,7 +211,8 @@ const binSplatsTransformer = (bin_data, groups, variables) => {
         bin.capture_data,
         groups,
         variables,
-        counter
+        counter,
+        hyCollapse,ahyCollapse
       );
       const group_data = Object.keys(container.group_data).reduce(
         (new_container, key) => {
@@ -185,7 +227,6 @@ const binSplatsTransformer = (bin_data, groups, variables) => {
     },
     { total_nh: 0, data: [], sq_nh: 0, group_data: counter }
   );
-
   return data;
 };
 
@@ -219,9 +260,9 @@ let SEScalculator = (datum) =>
     }, 0)
   );
 
-const binGroupProcessor = (bin_data, groups, variables, i) => {
+const binGroupProcessor = (bin_data, groups, variables, hyCollapse,ahyCollapse) => {
   return bin_data.map((bin) => {
-    const groups_data = binSplatsTransformer(bin.data, groups, variables);
+    const groups_data = binSplatsTransformer(bin.data, groups, variables,hyCollapse,ahyCollapse);
     const groupStats = Object.keys(groups_data.group_data).map((group_key) => {
       const group_data = groups_data.group_data[group_key];
 
@@ -248,23 +289,32 @@ const varSeCalculator = (group_data) => {
     : 0;
 };
 
-const varMeanCalculator = (group_data) => {
+const varMeanCalculator = (group_data, key) => {
   return group_data.sqsum > 0 ? group_data.sum / group_data.length : 0;
 };
 
-const varGroupProcessor = (bin_data, groups, variables, variable_name) => {
+const varGroupProcessor = (
+  bin_data,
+  groups,
+  variables,
+  variable_data,      ahyCollapse,
+  hyCollapse
+) => {
   return bin_data.map((bin) => {
     const groups_data = binVariableTransformer(
       bin.data,
       groups,
       variables,
-      variable_name
+      variable_data,
+      bin.bin,
+      ahyCollapse,
+      hyCollapse
     );
     const groupStats = Object.keys(groups_data.group_data).map((group_key) => {
       const group_data = groups_data.group_data[group_key];
 
       const groupsSE = varSeCalculator(group_data);
-      const mean = varMeanCalculator(group_data);
+      const mean = varMeanCalculator(group_data, group_key);
       return { bin: bin.bin, group: group_key, se: groupsSE, mean: mean };
     });
 
@@ -294,21 +344,23 @@ function binNestter(data) {
     .entries(data);
 }
 
+
 const plotFullProcessing = (
   data,
   binSize,
   stations,
   variables,
-  variable_data
+  variable_data,
+  hyCollapse,ahyCollapse
 ) => {
   const bins = createBins(365, binSize);
-  const groups = getGroups(data, variables);
+  const groups = getGroups(data, variables,hyCollapse,ahyCollapse);
 
   const stationData = filterStations(data.populated_effort, stations);
 
   const binData = newBinGroupper(stationData, bins);
 
-  const processed_data = binGroupProcessor(binData, groups, variables);
+  const processed_data = binGroupProcessor(binData, groups, variables,hyCollapse,ahyCollapse);
 
   const justStats = processed_data.map((bin) => bin.groupStats);
   const stacked = stackerD3(binNestter(flatten(justStats)), groups);
@@ -317,14 +369,13 @@ const plotFullProcessing = (
     binData,
     groups,
     variables,
-    variable_data.name
+    variable_data,hyCollapse,ahyCollapse
+    
   );
 
   const varjustStats = flatten(
-    varprocessed_data.map((bin) =>
-      bin.groupStats    )
-  )
-  .filter(grp=>grp.se>0);
+    varprocessed_data.map((bin) => bin.groupStats)
+  ).filter((grp) => grp.se > 0);
   const nested = d3
     .nest()
     .key((d) => d.group)

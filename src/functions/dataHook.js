@@ -18,7 +18,7 @@ const newRegionPlot = (region) => {
 const DataHook = () => {
   const [plotInfo, setPlotInfo] = useState([]);
   const [variables, setVariables] = useState(["AgeClass", "SexClass"]);
-
+  const [collapser,setCollapsers]= useState({hy:true,ahy:false})
   const [yMaxes, setYMaxes] = useState([20]);
   const [yMax, setYMax] = useState(20);
   const [fixedY, setFixedY] = useState(false);
@@ -27,6 +27,11 @@ const DataHook = () => {
     plotInfo,
   ]);
 
+
+  const changeAHYcollapser = () => setCollapsers({...collapser,ahy:!collapser.ahy})
+  const changeHYcollapser = () => {console.log("here");setCollapsers({...collapser,hy:!collapser.hy})
+}
+  const collapserHook = {collapser,changeAHYcollapser,changeHYcollapser}
   const addVariables = (variable) => setVariables(...variables, variable);
   const removeVariable = (variable) =>
     setVariables(variables.filter((vari) => vari !== variable));
@@ -43,11 +48,23 @@ const DataHook = () => {
   const addRegion = (plot_i, region) => {
     const regionData = regions.filter((reg) => reg.region === region)[0];
     const stations = [...plotInfo[plot_i].stations, ...regionData.stations];
-    console.log(stations);
     const final_regions = [...plotInfo[plot_i].regions, region];
     setPlotInfo([
       ...plotInfo.slice(0, plot_i),
       { ...plotInfo[plot_i], regions: final_regions, stations },
+      ...plotInfo.slice(plot_i + 1),
+    ]);
+  };
+
+  const removeRegion = (plot_i, region) => {
+    const regionData = regions.filter((reg) => reg.region === region)[0];
+    const newRegions = plotInfo[plot_i].regions.filter((reg) => reg !== region);
+    const newStations = plotInfo[plot_i].stations.filter(
+      (stat) => regionData.stations.indexOf(stat) < 0
+    );
+    setPlotInfo([
+      ...plotInfo.slice(0, plot_i),
+      { ...plotInfo[plot_i], regions: newRegions, stations: newStations },
       ...plotInfo.slice(plot_i + 1),
     ]);
   };
@@ -102,6 +119,9 @@ const DataHook = () => {
     addByRegion,
     maxYHook,
     addRegion,
+    removeRegion,
+    collapser,
+    collapserHook
   };
 };
 

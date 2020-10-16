@@ -73,15 +73,16 @@ const createArea = (svg, data, color, axis) => {
 };
 
 const updateArea = async (svg, data, color, axis) => {
-  const paths = svg.select("g").selectAll("path.area").data(data.stack);
-  paths.exit().remove();
+  const paths = svg.select("g").selectAll("path.area")
+  paths.data([]).exit().remove();
 
+  
   addArea(
-    setStyle(paths.enter().append("path").attr("class", "area"), data, color),
+    setStyle(paths.data([]).data(data.stack).enter().append("path").attr("class", "area"), data, color),
     axis
   );
 
-  addArea(paths, axis);
+  addArea(setStyle(paths.enter().append("path").attr("class", "area"), data,color), axis);
 };
 
 const createSplats = (splatsDiv, data, dimensions, yHook) => {

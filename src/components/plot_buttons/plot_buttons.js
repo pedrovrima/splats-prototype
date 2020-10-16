@@ -17,7 +17,6 @@ const PlotButtons = (props) => {
 
 
   const setStations = (region) => {
-    console.log(region);
     return region
       ? regions.filter((reg) => reg.region === region)[0].stations
       : [];
@@ -41,7 +40,7 @@ const PlotButtons = (props) => {
   const regionChecker = (regions, this_regions) => {
     regions.indexOf(this_regions) < 0
       ? regionFuncs.addRegion(i, this_regions)
-      : stationFuncs.removeStation(i, this_regions);
+      : regionFuncs.removeRegion(i, this_regions);
   };
 
 
