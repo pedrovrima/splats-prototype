@@ -7,6 +7,7 @@ const createPlot = (
   splatRef,
   varRef,
   effRef,
+  abdRef,
   i,
   variables,
   maxYHook,
@@ -28,7 +29,7 @@ const createPlot = (
   changeYMaxes(plotData.yMax, i);
   const maxValue = fixedY ? yMax : plotData.yMax;
 
-  plot_functions.createPlot(splatRef, varRef, effRef, plotData, maxValue);
+  plot_functions.createPlot(splatRef, varRef, effRef,  abdRef, plotData, maxValue);
 };
 
 const updatePlot = (
@@ -36,6 +37,7 @@ const updatePlot = (
   splatRef,
   varRef,
   effRef,
+  abdRef,
   i,
   variables,
   maxYHook,
@@ -59,7 +61,7 @@ const updatePlot = (
   changeYMaxes(plotData.yMax, i);
   const maxValue = fixedY ? yMax : plotData.yMax;
 
-  plot_functions.updateStatic(splatRef, varRef, effRef, plotData, maxValue);
+  plot_functions.updateStatic(splatRef, varRef, effRef,  abdRef, plotData, maxValue);
 };
 
 export default { createPlot, updatePlot };

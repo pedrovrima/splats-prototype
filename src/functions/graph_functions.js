@@ -23,23 +23,26 @@ const plot_dimensions = (container_dimensions, margins) => {
   };
 };
 
-function createPlot(splatRef, varRef, effRef, plotData,yHook ) {
+function createPlot(splatRef, varRef, effRef, abundRef,plotData,yHook ) {
   const c_dimension = container_dimensions(splatRef.clientWidth);
   const dimensions = plot_dimensions(c_dimension, margins(c_dimension));
   
+  console.log(plotData.effortData)
 
-  createEffort(effRef,plotData.effortData,  default_dimensions);
+  createEffort(abundRef,plotData.abundanceData,dimensions,"abund")
+  createEffort(effRef,plotData.effortData,  dimensions,"eff");
   createSplats(splatRef, plotData.splats, dimensions,yHook);
   createVariable(varRef,plotData.vari,dimensions,yHook)
 }
 
-const updateStatic= async(splatRef, varRef, effRef, plotData, yHook)=> {
+const updateStatic= async(splatRef, varRef, effRef,abundRef, plotData, yHook)=> {
   const c_dimension = container_dimensions(splatRef.clientWidth);
   const dimensions = plot_dimensions(c_dimension, margins(c_dimension));
 
   
 
-  updateEffort(effRef,plotData.effortData, dimensions);
+  updateEffort(effRef,plotData.effortData, dimensions,"eff");
+  updateEffort(abundRef,plotData.abundanceData,dimensions,"abund")
 
   updateSplats(splatRef, plotData.splats, dimensions,yHook);
   updateVariable(varRef, plotData.vari, dimensions,yHook);

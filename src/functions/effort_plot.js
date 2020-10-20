@@ -60,7 +60,7 @@ const createBars = (svg, data, dimensions, axis) => {
   addBars(newBarsPrep(svg, data), data, dimensions, axis);
 };
 
-const createEffort = (effDiv, data,  dimensions) => {
+const createEffort = (effDiv, data,  dimensions,type) => {
   let allNh = data.map((d) => d.value);
 
   const height = 200 - dimensions.margins.top - dimensions.margins.bottom;
@@ -75,8 +75,8 @@ const createEffort = (effDiv, data,  dimensions) => {
 
   // X axis
   addAxis(svg, axis, height);
-
-  addYLabel(svg,"Total nh",new_dimensions)
+  const label = type==="eff"?"Total NH":"Total Captures"
+  addYLabel(svg,label,new_dimensions)
   // Bars
   createBars(svg, data, new_dimensions, axis);
 };

@@ -54,7 +54,7 @@ const Container = (props) => {
         const regionData = this_regions(plot.regions);
         return (
           <div
-            className={`bg-white grid grid-cols-12 w-full rounded-lg m-2 p-6 shadow-md`}
+            className={`bg-white w-full rounded-lg m-2 p-6 shadow-md`}
           >
             <div className={`col-span-11 m-4`}>
               <span className="font-sans text-3xl text-gray-900 font-extrabold">
@@ -90,7 +90,7 @@ const Container = (props) => {
                 </svg>{" "}
               </button>
             </div>
-            <div className="col-span-8">
+            <div className="col-span-12">
               <Plots
                 plot_variable={plot_variable}
                 i={i}

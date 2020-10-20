@@ -168,7 +168,7 @@ const updateXAxis = (svg, axis, total_ticks = 10) => {
     .select("g.xAxis")
     .transition()
     .duration(1000)
-    .call(d3.axisBottom(axis.x).ticks(total_ticks));
+    .call(d3.axisBottom(axis.x).ticks(365 / 10));
 };
 
 const updateYAxisSpecial = (svg, axis, total_ticks = 10, tickArr) => {

@@ -26,7 +26,6 @@ const hyCollapseRemover = (value1, value2, hyCollapse) => {
 
 const ageCollapser=(value,ahyCollapse)=> 
 {
-  console.log(value)
   return value==="HY"||value.length===1?value:ahyCollapse?"AHY":value
 }
 
@@ -262,6 +261,7 @@ let SEScalculator = (datum) =>
 
 const binGroupProcessor = (bin_data, groups, variables, hyCollapse,ahyCollapse) => {
   return bin_data.map((bin) => {
+const totalCaps= bin.data.reduce((cont,val)=>cont+val.capture_data.length,0)
     const groups_data = binSplatsTransformer(bin.data, groups, variables,hyCollapse,ahyCollapse);
     const groupStats = Object.keys(groups_data.group_data).map((group_key) => {
       const group_data = groups_data.group_data[group_key];
@@ -275,7 +275,7 @@ const binGroupProcessor = (bin_data, groups, variables, hyCollapse,ahyCollapse) 
       return { bin: bin.bin, group: group_key, se: groupsSE, bnh: birdsPerNh };
     });
     const binSe = SEScalculator(groupStats);
-    return { bin: bin.bin, bin_se: binSe, ...groups_data, groupStats };
+    return { bin: bin.bin, bin_se: binSe, ...groups_data, groupStats,totalCaps };
   });
 };
 
@@ -361,6 +361,7 @@ const plotFullProcessing = (
   const binData = newBinGroupper(stationData, bins);
 
   const processed_data = binGroupProcessor(binData, groups, variables,hyCollapse,ahyCollapse);
+  
 
   const justStats = processed_data.map((bin) => bin.groupStats);
   const stacked = stackerD3(binNestter(flatten(justStats)), groups);
@@ -372,6 +373,7 @@ const plotFullProcessing = (
     variable_data,hyCollapse,ahyCollapse
     
   );
+
 
   const varjustStats = flatten(
     varprocessed_data.map((bin) => bin.groupStats)
@@ -395,7 +397,10 @@ const plotFullProcessing = (
       variable_data: variable_data,
       flat: varjustStats,
     },
-
+    abundanceData: processed_data.map((datum) => {
+      return { value: datum.totalCaps, group: datum.bin };
+    }),
+    
     effortData: processed_data.map((datum) => {
       return { value: datum.total_nh, group: datum.bin };
     }),

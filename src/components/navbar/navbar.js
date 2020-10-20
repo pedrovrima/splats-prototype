@@ -69,7 +69,7 @@ const NavBar = (props) => {
     <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6">
       <Logo></Logo>
       <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
-        <FixY maxYHook={maxYHook}></FixY>
+        {/* <FixY maxYHook={maxYHook}></FixY> */}
         <GroupVarMenu
           variableSet={groupVariables}
           variableHook={{ variables, setVariables }}

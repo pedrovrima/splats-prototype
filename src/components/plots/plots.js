@@ -17,9 +17,11 @@ const Plots = (props) => {
   const splatsRef = useRef(null);
   const effortRef = useRef(null);
   const variablesRef = useRef(null);
+  const abundRef = useRef(null);
 
   const [showEffort, setShowEffort] = useState(false);
   const [showVariable, setShowVariable] = useState(false);
+  const [showAbundance, setShowAbundance] = useState(false);
 
   const [changeY, setChangeY] = useState(0);
 
@@ -31,6 +33,7 @@ const Plots = (props) => {
         variablesRef.current,
 
         effortRef.current,
+        abundRef.current,
         i,
         variables,
         maxYHook,
@@ -48,6 +51,8 @@ const Plots = (props) => {
       variablesRef.current,
 
       effortRef.current,
+      abundRef.current,
+
       i,
       variables,
       maxYHook,
@@ -67,6 +72,8 @@ const Plots = (props) => {
         variablesRef.current,
 
         effortRef.current,
+        abundRef.current,
+
         i,
         variables,
         maxYHook,
@@ -85,6 +92,12 @@ const Plots = (props) => {
         ref={variablesRef}
         id="vari"
       ></div>
+            <div
+        className={`${showAbundance ? "" : "hidden"}`}
+        ref={abundRef}
+        id="abund"
+      ></div>
+
       <div
         ref={effortRef}
         className={`${showEffort ? "" : "hidden"}`}
@@ -98,6 +111,15 @@ const Plots = (props) => {
       >
         {showEffort ? "Hide" : "Show"} effort
       </button>
+      <button
+        className="btn-add-flex"
+        onClick={() => {
+          setShowAbundance(!showAbundance);
+        }}
+      >
+        {showAbundance? "Hide" : "Show"} abundance
+      </button>
+
       <button
         className="btn-add-flex"
         onClick={() => {
