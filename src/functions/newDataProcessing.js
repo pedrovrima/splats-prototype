@@ -51,7 +51,7 @@ const longPaster = (arrays, hyCollapse,ahyCollapse) => {
 const uniqueArray = (arr) => [...new Set(arr)];
 
 const getGroups = (data, variables, hyCollapse,ahyCollapse) => {
-  const { groups } = data;
+  const  groups  = [{variable:"AgeClass",data:["AHY", "HY","SY","ASY"]},{variable:"SexClass",data:["F", "M","U"]}]
   const selectedGroups = groups.filter(
     (group) => variables.indexOf(group.variable) > -1
   );
@@ -205,8 +205,8 @@ const binSplatsTransformer = (bin_data, groups, variables,hyCollapse,ahyCollapse
 
   let data = bin_data.reduce(
     (container, bin, i) => {
-      const nethours = bin.nethours ? bin.nethours : 0;
-      const total_nh = container.total_nh + nethours;
+      const nethours = bin.nethours ? +bin.nethours : 0;
+      const total_nh = +container.total_nh + nethours;
       const sq_nh = container.sq_nh + Math.pow(nethours, 2);
       const thin_bin_data = capturesGroupCounter(
         bin.capture_data,
@@ -355,15 +355,16 @@ const plotFullProcessing = (
   variable_data,
   hyCollapse,ahyCollapse
 ) => {
+  console.log(data)
   const bins = createBins(365, binSize);
   const groups = getGroups(data, variables,hyCollapse,ahyCollapse);
 
-  const stationData = filterStations(data.populated_effort, stations);
+  const stationData = filterStations(data, stations);
 
   const binData = newBinGroupper(stationData, bins);
-
-  const processed_data = binGroupProcessor(binData, groups, variables,hyCollapse,ahyCollapse);
   
+  const processed_data = binGroupProcessor(binData, groups, variables,hyCollapse,ahyCollapse);
+  console.log(processed_data)  
 
   const justStats = processed_data.map((bin) => bin.groupStats);
   const stacked = stackerD3(binNestter(flatten(justStats)), groups);

@@ -12,6 +12,7 @@ const Plots = (props) => {
     plot_variable,
     hyCollapse,
     ahyCollapse,
+    data
   } = props;
 
   const splatsRef = useRef(null);
@@ -29,6 +30,7 @@ const Plots = (props) => {
     if (maxYHook.fixedY) {
       plot_functions.updatePlot(
         plotData,
+        data,
         splatsRef.current,
         variablesRef.current,
 
@@ -47,6 +49,7 @@ const Plots = (props) => {
   useDidMountEffect(() => {
     plot_functions.updatePlot(
       plotData,
+      data,
       splatsRef.current,
       variablesRef.current,
 
@@ -68,6 +71,7 @@ const Plots = (props) => {
     if (splatsRef.current) {
       plot_functions.createPlot(
         plotData,
+        data,
         splatsRef.current,
         variablesRef.current,
 

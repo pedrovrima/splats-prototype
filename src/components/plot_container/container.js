@@ -15,7 +15,9 @@ const Container = (props) => {
     maxYHook,
     addRegion,
     removeRegion,
-    collapser
+    collapser,
+    data,
+    
   } = DataHook;
 
   
@@ -49,7 +51,7 @@ const Container = (props) => {
     return `${hasRegion}${solo_stations.join(", ")}`;
   };
 
-  return (
+  return (<div>{data?
     <div className={`flex items-center w-full flex-col`}>
       {plotInfo.map((plot, i) => {
         console.log(plot)
@@ -96,6 +98,7 @@ const Container = (props) => {
               <Plots
                 plot_variable={plot_variable}
                 i={i}
+                data={data}
                 maxYHook={maxYHook}
                 plotData={plot}
                 setBinSize={changeBinSize}
@@ -128,6 +131,7 @@ const Container = (props) => {
           </div>
         );
       })}
+    </div>:""}
     </div>
   );
 };

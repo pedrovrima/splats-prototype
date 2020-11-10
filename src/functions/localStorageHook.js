@@ -16,7 +16,12 @@ const LocalStorageHook =  ()=>{
             localStorage.setItem("userProgress",JSON.stringify(storageData))
         },[storageData])
 
-        return {storageData,setStorageData}
+
+        const setLocalStore = (spp,data)=>{
+            setStorageData({...storageData,[spp]:data})
+        }
+
+        return {storageData,setLocalStore}
         
 
 }

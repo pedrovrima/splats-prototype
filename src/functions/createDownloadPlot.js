@@ -1,7 +1,11 @@
 import dataFuncs from "./newDataProcessing";
-import data from "./effort_capture_joinner";
+
 import splatsPlots from "./splats_plot";
 import effortPlots from "./effort_plot";
+
+const data = require("../data/api_data.json");
+console.log("data",data)
+
 const container_dimensions = (width = 800, height = 500) => {
   return { width, height };
 };

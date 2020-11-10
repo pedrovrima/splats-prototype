@@ -1,9 +1,11 @@
 import dataFuncs from "./newDataProcessing";
 import plot_functions from "./graph_functions";
-import data from "./effort_capture_joinner";
+
 
 const createPlot = (
   plotInfo,
+  data,
+
   splatRef,
   varRef,
   effRef,
@@ -13,8 +15,10 @@ const createPlot = (
   maxYHook,
   variable_name,
   hyCollapse,
-  ahyCollapse
+  ahyCollapse,
 ) => {
+
+    console.log(data)
   const { yMax, fixedY, changeYMaxes } = maxYHook;
   const { stations, binSize } = plotInfo;
   const plotData = dataFuncs.plotFullProcessing(
@@ -30,10 +34,12 @@ const createPlot = (
   const maxValue = fixedY ? yMax : plotData.yMax;
 
   plot_functions.createPlot(splatRef, varRef, effRef,  abdRef, plotData, maxValue);
+  
 };
 
 const updatePlot = (
   plotInfo,
+  data,
   splatRef,
   varRef,
   effRef,

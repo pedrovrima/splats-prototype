@@ -17,11 +17,12 @@ function App() {
   const [modal, setModal] = useState(false);
   const dHook = DataHook();
 
-
   let [groupVariables, setGroupVariables] = useState(["AgeClass", "SexClass"]);
 
-  let [plot_variable, setPlotVariable] = useState(    {name:"WingLength",label:"Wing Length"},
-  );
+  let [plot_variable, setPlotVariable] = useState({
+    name: "WingLength",
+    label: "Wing Length",
+  });
 
   // const click = function () {
   //   const svg = d3.select("svg");
@@ -46,13 +47,30 @@ function App() {
         setPlotVariable={setPlotVariable}
         plot_variable={plot_variable}
       ></NavBar>
-      <div className="flex flex-col items-center">
-        <div className="flex flex-col   w-10/12 items-center">
-          <p className="text-6xl font-extrabold">SWTH</p>
-          <Container DataHook={dHook} variables={groupVariables} plot_variable={plot_variable}></Container>
-          <NewPlot setModal={setModal}></NewPlot>
+      {!dHook.spp ? (
+        <>
+          <h2>Choose a Species</h2>
+          <button className="btn-add" onClick={() => dHook.setSpp("STJA")}>
+            {" "}
+            Stellars Jay
+          </button>
+        </>
+      ) : dHook.data.length > 0 ? (
+        <div className="flex flex-col items-center">
+          <div className="flex flex-col   w-10/12 items-center">
+            <p className="text-6xl font-extrabold">{dHook.spp}</p>
+            <Container
+              DataHook={dHook}
+              variables={groupVariables}
+              plot_variable={plot_variable}
+            ></Container>
+            <NewPlot setModal={setModal}></NewPlot>
+          </div>
         </div>
-        {/* <button
+      ) : (
+        "loading"
+      )}
+      {/* <button
 
 
 type="button"
@@ -62,7 +80,6 @@ type="button"
           Download
         </button>
       </div> */}
-      </div>
     </div>
   );
 }

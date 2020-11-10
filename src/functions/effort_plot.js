@@ -47,8 +47,8 @@ const updateBarsPrep = (svg,data)=>
     .data(data)
     .enter()
     .append("rect")
-    .transition()
-    .duration(500)
+    // .transition()
+    // .duration(500)
 
 
 
@@ -83,7 +83,7 @@ const createEffort = (effDiv, data,  dimensions,type,whiteSize=0) => {
 
 const updateEffort = (effDiv, data, dimensions) => {
   const height = 200 - dimensions.margins.top - dimensions.margins.bottom;
-  const new_dimensions = { ...dimensions, height };
+  const new_dimensions = { ...dimensions };
 
   var svg = d3.select(effDiv);
 

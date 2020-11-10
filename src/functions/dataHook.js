@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { regions } from "../data/regions";
-import LocalStorageHook from "./localStorageHook"
-
+import LocalStorageHook from "./localStorageHook";
+import axios from "axios";
 
 const newPlotInfo = (stations) => {
   return { stations: [stations], binSize: 10, regions: [], yMax: 10 };
@@ -18,11 +18,13 @@ const newRegionPlot = (region) => {
 };
 
 const DataHook = () => {
-  const localStore = LocalStorageHook()
+  const localStore = LocalStorageHook();
 
+  const [spp, setSpp] = useState();
+  const [data, setData] = useState([]);
   const [plotInfo, setPlotInfo] = useState([]);
   const [variables, setVariables] = useState(["AgeClass", "SexClass"]);
-  const [collapser,setCollapsers]= useState({hy:true,ahy:false})
+  const [collapser, setCollapsers] = useState({ hy: true, ahy: false });
   const [yMaxes, setYMaxes] = useState([20]);
   const [yMax, setYMax] = useState(20);
   const [fixedY, setFixedY] = useState(false);
@@ -31,17 +33,38 @@ const DataHook = () => {
     plotInfo,
   ]);
 
-  useEffect(() => {if(plotInfo.length===0 && localStore.storageData){setPlotInfo(localStore.storageData)}} ,[localStore])
+  const setRemoteData = async () => {
+    const data = await axios
+      .post("http://localhost:3000/efforts_by_station")
+      .catch((e) => console.log(e));
+    setData(data.data);
+  };
 
-  useEffect(() =>{
-    if(plotInfo.length){
-    localStore.setStorageData(plotInfo)}
-  },[plotInfo])
+  useEffect(() => {
+    setRemoteData();
+  }, []);
 
-  const changeAHYcollapser = () => setCollapsers({...collapser,ahy:!collapser.ahy})
-  const changeHYcollapser = () => {console.log("here");setCollapsers({...collapser,hy:!collapser.hy})
-}
-  const collapserHook = {collapser,changeAHYcollapser,changeHYcollapser}
+  
+
+  useEffect(() => {
+    if (plotInfo.length === 0 && localStore.storageData) {
+      setPlotInfo(localStore.storageData["STJA"]);
+    }
+  }, [localStore,data]);
+
+  useEffect(() => {
+    if (plotInfo.length) {
+      localStore.setLocalStore("STJA", plotInfo);
+    }
+  }, [plotInfo]);
+
+  const changeAHYcollapser = () =>
+    setCollapsers({ ...collapser, ahy: !collapser.ahy });
+  const changeHYcollapser = () => {
+    console.log("here");
+    setCollapsers({ ...collapser, hy: !collapser.hy });
+  };
+  const collapserHook = { collapser, changeAHYcollapser, changeHYcollapser };
   const addVariables = (variable) => setVariables(...variables, variable);
   const removeVariable = (variable) =>
     setVariables(variables.filter((vari) => vari !== variable));
@@ -114,6 +137,15 @@ const DataHook = () => {
     setPlotInfo(newPlotInfo);
   };
 
+  const changeSpecies = (spp) => {
+    if (localStore.storageData[spp]) {
+      setPlotInfo(localStore.storageData[spp]);
+    } else {
+      localStore.setLocalStore(spp, []);
+      setPlotInfo([]);
+    }
+  };
+
   const maxYHook = { yMax, fixedY, changeYMaxes, setFixedY };
 
   return {
@@ -131,7 +163,9 @@ const DataHook = () => {
     addRegion,
     removeRegion,
     collapser,
-    collapserHook
+    collapserHook,
+    data,
+    spp, setSpp
   };
 };
 
