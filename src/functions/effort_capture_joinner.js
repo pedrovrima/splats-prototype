@@ -17,7 +17,7 @@ const createJulianDay = (string_date) => {
   };
   
 
-const dataProcessing = (data, variables) => {
+const dataProcessing = (effort, captures, variables) => {
     // Julian effort
     const groups = variables.sort().map((vari) => {
       return {
