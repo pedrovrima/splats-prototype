@@ -16,6 +16,7 @@ const createDots = (dotSvg, dimensions, color) => {
 };
 
 const opacityChangerOver = (data, d) => {
+  console.log(d,data)
     d3.selectAll(`.${d.replace(/\s+/g, "")}`).attr("opacity", "1")
     d3.selectAll(`.line${d.replace(/\s+/g, "")}`).attr("opacity", "1")
 
@@ -42,7 +43,7 @@ const createText = (textSvg, data, dimensions, color) => {
     .data(data.groups)
     .enter()
     .append("text")
-    .on("mouseover", (d) => opacityChangerOver(data,d))
+    .on("mouseover", (d,datum) => opacityChangerOver(data,datum))
     .on("mouseout", (d) => opacityChangerOut(data))
 
     .attr("x", dimensions.width + 10)
@@ -51,6 +52,7 @@ const createText = (textSvg, data, dimensions, color) => {
     }) // 100 is where the first dot appears. 25 is the distance between dots
     .style("fill", "black")
     .text(function (d) {
+      console.log(d)
       return d;
     })
     .attr("text-anchor", "left")
